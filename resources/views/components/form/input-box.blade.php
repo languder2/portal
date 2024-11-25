@@ -1,4 +1,4 @@
-<div class="relative input-box">
+<div class="input-box relative">
     <input type         = "{{$type??"text"}}"
            name         = "{{@$name}}"
            id           = "{{@$id}}"
@@ -12,8 +12,8 @@
                     focus:outline-none focus:ring-0 focus:border-blue-600
                     peer                    "
            placeholder  = ""
-           value="{{@$fill}}"
-           @if(isset($name))
+           value="{{@$value}}"
+           @if(isset($required))
                required
            @endif
     />

@@ -1,13 +1,29 @@
 @import 'flowbite';
-/*
 @import '../css/autofill.css';
-*/
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-*{
-    font-family: 'Poppins', serif !important;
+@layer base {
+    @font-face {
+        font-family: CenturyGothic;
+        font-weight: normal;
+        src: url(../fonts/centurygothic/centurygothic.ttf) format("tff");
+    }
+    @font-face {
+        font-family: CenturyGothic;
+        font-weight: bold;
+        src: url(../fonts/centurygothic/centurygothic_bold.ttf) format("tff");
+
+    }
+}
+
+html{
+    font-family:        'Century Gothic', serif !important;
+    font-size:          20px;
+    line-height:        30px;
+}
+h3{
+
 }

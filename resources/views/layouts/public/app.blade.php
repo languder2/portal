@@ -7,24 +7,16 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body>
-<header>
-    <!-- Общий хедер -->
-</header>
+<body class="bg-gray-200">
+@include("layouts.public.header")
 
-<main class="flex bg-amber-600 flex-wrap">
-    <nav class="sidebar bg-blue-400">
-        @yield('menu')
-        asd
-        asd
-    </nav>
-    <section class="bg-amber-950 w">
+@yield('menu')
+
+<main>
+    <section>
         @yield('content')
     </section>
 </main>
 
-<footer>
-    <!-- Общий футер -->
-</footer>
 </body>
 </html>

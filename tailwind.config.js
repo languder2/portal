@@ -15,6 +15,17 @@ export default {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
+            margin: {
+                '18rem'     : '18rem',
+                '19rem'     : '19rem',
+            },
+            width: {
+                '18rem'     : '18rem',
+            },
+            colors: {
+                baseRed     : '#820000',
+                test        : '#777700'
+            },
         },
     },
     plugins: [

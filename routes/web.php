@@ -12,13 +12,14 @@ Route::get('/', function () {
 //    return view('welcome');
     return view("pages.public.main",[
         "authCheck"     => auth()->check(),
-        "test"          => 221
     ]);
 });
 
 
 
 Route::controller(UserController::class)->prefix("user")->group(function () {
+    Route::post("login","login");
+
     Route::get('profile', function (){
         return view('user.profile',[
             "user"  => User::find(1)

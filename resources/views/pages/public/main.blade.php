@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.public.app')
 
 @section('title', 'Портал ФГБОУ ВО "МелГУ"')
 
@@ -9,4 +9,8 @@
 
     @include("content.public.main")
 
+@endsection
+
+@section('menu')
+    @include("layouts.public.menu")
 @endsection
