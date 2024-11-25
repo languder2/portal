@@ -13,7 +13,7 @@ Route::get('/', function () {
     return view("pages.public.main",[
         "authCheck"     => auth()->check(),
     ]);
-});
+})->name("home");
 
 
 

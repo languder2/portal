@@ -1,5 +1,4 @@
 <section class="mt-4 ml-0 md:ml-19rem px-4 py-4 bg-white rounded-l-md">
-    @dump($errors)
 
     <form
         action          = "{{url("user/login")}}"
@@ -10,9 +9,18 @@
         autocomplete    = "on"
     >
         @csrf
-        <h3 class="border-b mb-4 pb-1">
-                Авторизация
+        <h3 class="border-b mb-4 pb-1 text-xl">
+            Авторизация
         </h3>
+
+        @if(!is_null($errors) && $errors->all())
+            <div class="border-2 border-l-4 border-l-red-700 mb-6 px-3 py-2 rounded-md">
+                @foreach ($errors->all() as $message)
+                    {!! $message !!}
+                @endforeach
+            </div>
+        @endif
+
         <x-form.input-bb-box
             type="email"
             name="form[email]"

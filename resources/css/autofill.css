@@ -14,4 +14,8 @@ select:-webkit-autofill:focus {
 {
 
 }
+.input-box:has(>input:is(:-webkit-autofill)) input
+{
+
+}
 
