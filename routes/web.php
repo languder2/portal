@@ -6,16 +6,30 @@ use App\Http\Controllers\TestController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminServiceController;
 
+use App\Models\User;
+
 Route::get('/', function () {
-    return view('welcome');
+//    return view('welcome');
+    return view("pages.public.main",[
+        "authCheck"     => auth()->check(),
+        "test"          => 221
+    ]);
 });
 
-Route::controller(UserController::class)->group(function () {
+
+
+Route::controller(UserController::class)->prefix("user")->group(function () {
+    Route::get('profile', function (){
+        return view('user.profile',[
+            "user"  => User::find(1)
+        ]);
+    });
     Route::get('test', "test");
 });
 
 Route::controller(TestController::class)->prefix("test")->group(function () {
 
+    Route::get('',                  "test");
     Route::get("redis/set",         "redisSet");
     Route::get("redis/get",         "redisGet");
     Route::get("session/set",       "sessionSet");

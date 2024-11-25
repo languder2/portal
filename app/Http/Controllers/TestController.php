@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Session;
 use App\Models\User;
+use Illuminate\View\View;
 
 class TestController extends Controller
 {
@@ -85,5 +86,16 @@ class TestController extends Controller
 
         return "";
     }
+
+    public function test():view
+    {
+
+        return view("test",[
+            "authStatus"    => (bool)auth()->check(),
+            //    "user"          => auth()->user(),
+            "user"          => User::find(1),
+        ]);
+    }
+
 
 }
