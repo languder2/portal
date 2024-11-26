@@ -1,7 +1,6 @@
-<section class="mt-4 ml-0 md:ml-19rem px-4 py-4 bg-white rounded-l-md">
-
+<section class="bg-white p-4 rounded-l-md">
     <form
-        action          = "{{url("user/login")}}"
+        action          = "{{url(route("auth"))}}"
         method          = "POST"
         id              = "formLogin"
         name            = "formLogin"
@@ -53,14 +52,14 @@
 
         <p class="text-center my-2">
             Нет аккаунта?
-            <a  href    = "{{url("user/register")}}"
+            <a  href    = "{{url(route('register'))}}"
                 class   = "text-baseRed hover:text-red-700 active:text-gray-700"
             >
                 Зарегистрируйтесь
             </a>
         </p>
         <p class="text-center my-2">
-            <a  href    = "{{url("user/pass-recover")}}"
+            <a  href    = "{{url(route('pass.recovery'))}}"
                 class   = "text-baseRed hover:text-red-700 active:text-gray-700"
             >
                 Не помните пароль?

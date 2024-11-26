@@ -10,13 +10,16 @@
         @if(isset($value))
             value   = "{{$value}}"
         @endif
+        @if(isset($checked))
+            checked
+        @endif
         class   = "
             w-4 h-4 text-baseRed bg-gray-100 border-gray-300 rounded
             focus:ring-baseRed focus:ring-2
             cursor-pointer
         "
+        @checked(old('form.remember'))
     >
-
     <label
         @if(isset($id))
             for     = "{{$id}}"

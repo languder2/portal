@@ -1,7 +1,8 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminServiceController;
@@ -9,24 +10,43 @@ use App\Http\Controllers\AdminServiceController;
 use App\Models\User;
 
 Route::get('/', function () {
-//    return view('welcome');
-    return view("pages.public.main",[
-        "authCheck"     => auth()->check(),
+
+    if (auth()->check())
+        return redirect()->route("account");
+
+    return view("pages.public.account",[
+        "form"  => view("account.public.forms.login",[]),
+        "headTitle" => 'Портал ФГБОУ ВО "МелГУ": Авторизация'
     ]);
 })->name("home");
 
+Route::get("message",function(){
+
+    if(session()->missing('message'))
+        return redirect(route("home"));
+
+    return view("pages.public.message",["message" => session('message')]);
+})->name("message");
 
 
-Route::controller(UserController::class)->prefix("user")->group(function () {
-    Route::post("login","login");
+Route::controller(AccountController::class)->prefix("account")->group(function () {
+    Route::post("login","auth")->name("auth");
 
-    Route::get('profile', function (){
-        return view('user.profile',[
-            "user"  => User::find(1)
-        ]);
+    Route::get("register",function(){return "register";})->name("register");
+
+    Route::view("pass-recovery","pages.public.account",[
+        "form"  => view("account.public.forms.pass-recovery",[]),
+        "headTitle" => 'Портал ФГБОУ ВО "МелГУ": Восстановление пароля'
+    ])->name("pass.recovery");
+
+    Route::post("pass/recovery/create","passRecoveryCreate")->name("pass-recovery-create-token");
+
+    Route::get("pass-recovery/{token}","passRecoveryConfirm")->name("pass.recovery.token");
+
+    Route::middleware("auth.check")->group(function () {
+        Route::get("","page")->name("account");
     });
-    Route::get('test', "test");
-});
+ });
 
 Route::controller(TestController::class)->prefix("test")->group(function () {
 
@@ -50,10 +70,12 @@ Route::redirect('login', 'account/login');
 
 Route::controller(AuthController::class)->prefix("account")->group(function () {
     Route::view('login',            "login")->name('login');
+
     Route::get('logout',           function (){
         auth()->logout();
         return redirect("/");
     })->name('logout');
+
     Route::view('r',                "404");
 });
 

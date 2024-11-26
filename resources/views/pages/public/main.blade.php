@@ -3,9 +3,8 @@
 @section('title', 'Портал ФГБОУ ВО "МелГУ"')
 
 @section('content')
-    @if(!isset($atuhCheck))
-        @include("user.public.forms.login")
-    @endif
+
+    @include("account.public.forms.login")
 
     @include("content.public.main")
 

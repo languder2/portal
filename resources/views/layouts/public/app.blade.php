@@ -12,10 +12,8 @@
 
 @yield('menu')
 
-<main>
-    <section>
-        @yield('content')
-    </section>
+<main class="mt-4 ml-0 md:ml-19rem">
+    @yield('content')
 </main>
 
 </body>

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\SendEmailJob;
-use App\Mail\TestEmail;
+use App\Mail\SendEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -21,10 +21,15 @@ class TestController extends Controller
 
     public function email():string
     {
-        Mail::to("languder2@gmail.com")->send(new TestEmail(
+        Mail::to("languder2@gmail.com")->send(new SendEmail(
             (object)[
-                "lastname"      => "Sultan",
-                "firstname"     => "Sergey2",
+                "template"      => "emails.account.pass-recovery",
+                "subject"       => "pass-recovery",
+                "user"          => (object)[
+                    'email'         => 'languder2@gmail.com',
+                    "lastname"      => "Sultan",
+                    "firstname"     => "Sergey2",
+                ]
             ]
         ));
         return "email sent";
@@ -32,13 +37,16 @@ class TestController extends Controller
 
     public function job():string
     {
-        $data = (object)[
-            'email'         => 'languder2@gmail.com',
-            "lastname"      => "Sultan",
-            "firstname"     => "Sergey2",
-        ];
 
-        SendEmailJob::dispatch($data);
+        SendEmailJob::dispatch((object)[
+            "template"      => "emails.account.pass-recovery",
+            "subject"       => "pass-recovery",
+            "user"          => (object)[
+                'email'         => 'languder2@gmail.com',
+                "lastname"      => "Sultan",
+                "firstname"     => "Sergey2",
+            ]
+        ]);
 
         return "job create";
     }

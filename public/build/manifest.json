@@ -1,11 +1,19 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-BwouCTCp.css",
+    "file": "assets/app-Fs8WL__7.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
+  "resources/fonts/centurygothic/centurygothic.ttf": {
+    "file": "assets/centurygothic-BOrGIO_o.ttf",
+    "src": "resources/fonts/centurygothic/centurygothic.ttf"
+  },
+  "resources/fonts/centurygothic/centurygothic_bold.ttf": {
+    "file": "assets/centurygothic_bold-BbKWdxWh.ttf",
+    "src": "resources/fonts/centurygothic/centurygothic_bold.ttf"
+  },
   "resources/js/app.js": {
-    "file": "assets/app-z-Rg4TxU.js",
+    "file": "assets/app-C9u6M23j.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true

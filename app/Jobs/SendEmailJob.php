@@ -8,7 +8,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\TestEmail;
+use App\Mail\SendEmail;
 
 class SendEmailJob implements ShouldQueue
 {
@@ -21,9 +21,7 @@ class SendEmailJob implements ShouldQueue
      */
     public function __construct($data)
     {
-
-        $this->data = $data;
-        //
+        $this->data         = $data;
     }
 
     /**
@@ -31,6 +29,6 @@ class SendEmailJob implements ShouldQueue
      */
     public function handle(): void
     {
-        Mail::to($this->data->email)->send(new TestEmail($this->data));
+        Mail::to($this->data->user->email)->send(new SendEmail($this->data));
     }
 }
