@@ -22,7 +22,7 @@ class UserController extends Controller
     public function login(Request $request): JsonResponse|string|RedirectResponse
     {
 
-        $request->validate(
+        $validation = $request->validate(
             [
                 "form.email"                => "required|email",
                 "form.password"             => "required",
@@ -32,15 +32,7 @@ class UserController extends Controller
             ]
         );
 
-        $form = $request->post("form");
-
-        $user = User::where("email",$form["email"])->first();
-
-        $error = new MessageBag;
-        $error->add("test",view("messages.user-not-found"));
-
-
-        echo view("messages.user-not-found")->render();
+        $user = User::where("email",$validation['form']['email'])->first();
 
         if(is_null($user))
             return redirect()->back()->withInput()->withErrors([
@@ -48,11 +40,15 @@ class UserController extends Controller
             ]);
 
 
+        dump($user->password);
+        dump($validation['form']['password']);
 
-        $errors = new MessageBag;
 
-        $errors->add("errorTest","3123");
 
-        return redirect()->back()->withErrors($errors);
+        dd();
+
+        return redirect()->back()->withInput()->withErrors([
+            "msg"   => view("messages.user-invalid-password")->render()
+        ]);
     }
 }

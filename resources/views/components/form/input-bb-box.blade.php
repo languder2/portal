@@ -13,7 +13,11 @@
                     {{@$class}}
                     "
            placeholder  = ""
-           value="{{@$value}}"
+
+           @if(isset($value))
+               value="{{@$value}}"
+           @endif
+
            @if(isset($required))
                required
            @endif

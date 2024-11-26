@@ -27,8 +27,8 @@
             id="loginEmail"
             label="Email"
             required
+            value="{{old('form.email')}}"
         />
-
         <x-form.input-bb-box
             type="password"
             name="form[password]"
