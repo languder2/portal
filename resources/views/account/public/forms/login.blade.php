@@ -52,18 +52,11 @@
 
         <p class="text-center my-2">
             Нет аккаунта?
-            <a  href    = "{{url(route('register'))}}"
-                class   = "text-baseRed hover:text-red-700 active:text-gray-700"
-            >
-                Зарегистрируйтесь
-            </a>
+
+            <x-html.a link="{{url(route('register'))}}" text="Зарегистрируйтесь"/>
         </p>
         <p class="text-center my-2">
-            <a  href    = "{{url(route('pass.recovery'))}}"
-                class   = "text-baseRed hover:text-red-700 active:text-gray-700"
-            >
-                Не помните пароль?
-            </a>
+            <x-html.a link="{{url(route('pass.recovery'))}}" text="Не помните пароль?"/>
         </p>
     </form>
 </section>

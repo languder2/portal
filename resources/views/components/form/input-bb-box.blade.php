@@ -14,9 +14,19 @@
                     "
            placeholder  = ""
 
+           @if(isset($minlength))
+               minlength="{{@$minlength}}"
+           @endif
+
+           @if(isset($pattern))
+               pattern="{{@$pattern}}"
+           @endif
+
            @if(isset($value))
                value="{{@$value}}"
            @endif
+
+           autocomplete="off"
 
            @if(isset($required))
                required

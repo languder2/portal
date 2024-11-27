@@ -7,11 +7,13 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Models\User;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Facades\DB;
 use App\Models\Token;
+use App\Models\Notification;
+
 
 class AccountController extends Controller
 {
@@ -73,11 +75,16 @@ class AccountController extends Controller
             $token = Str::random(32);
         while(Token::where("token",$token)->exists());
 
-        Token::created([
-            "token"     => $token,
-            "email"     => $user->email,
-            "code"      => "pass-recovery"
-        ]);
+        Token::updateOrCreate(
+            [
+                "email"     => $user->email,
+            ],
+            [
+                "token"     => $token,
+                "email"     => $user->email,
+                "code"      => "pass-recovery"
+            ]
+        );
 
         SendEmailJob::dispatch((object)[
             "template"      => "emails.account.pass-recovery",
@@ -95,9 +102,79 @@ class AccountController extends Controller
 
     public function passRecoveryConfirm($token)
     {
+        $token = Token::where("updated_at",">", Carbon::now()->subHours(3))
+            ->where("token",$token)
+            ->first();
 
-        $record     = DB::table('password_reset_tokens')->where("token",$token)->first();
-        dd($token,$record);
+        if(is_null($token))
+            return redirect()->route("message")->with([
+                "message"   => view("messages.account.pass-recovery-invalid-token")->render()
+            ]);
+
+        Session::put("ChangePassAvailable",$token->email);
+
+        $token->delete();
+
+        return redirect(route("change-password"));
+    }
+
+    public function changePassword(Request $request)
+    {
+        $validation = $request->validate(
+            [
+                "newPass"               => "required|confirmed:newPassConfirm|regex:'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*#?&-])[A-Za-z\d@$!%*#?&-]{8,}$'",
+            ],
+            [
+                'newPass.required'      => 'Не указан новый пароль',
+                'newPass.confirmed'     => 'Пароль и подтверждение не совпадают',
+                'newPass.regex'         => 'Пароль не соответствует требованиям',
+            ]
+        );
+
+
+        if(Session::exists("ChangePassAvailable"))
+            $user = User::where("email",Session::get("ChangePassAvailable"))->first();
+
+        elseif(auth()->check())
+            $user = auth()->user();
+        else
+            return redirect(route("home"));
+
+
+        $user->update([
+            "password"  => bcrypt($validation['newPass'])
+        ]);
+
+        if(Session::exists("ChangePassAvailable")){
+            Session::remove("ChangePassAvailable");
+
+            return redirect()->route("message")->with([
+                "message"   =>  view("messages.account.new-pass-save",[])->render()
+            ]);
+
+        }
+
+        Notification::updateOrCreate(
+            [
+                "code"  => "save-password",
+                "uid"   => $user->id,
+            ],
+            [
+                "code"      => "save-password",
+                "type"      => "success",
+                "uid"       => $user->id,
+                "message"   => "Новый пароль сохранен"
+            ]
+        );
+
+        return redirect()->route("account");
+
+    }
+
+    public function passwordGenerate()
+    {
+
+        dd("passwordGenerate");
     }
 
     public function page():View

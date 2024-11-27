@@ -95,14 +95,17 @@ class TestController extends Controller
         return "";
     }
 
-    public function test():view
+    public function test()
     {
+        auth()->loginUsingId(1);
 
-        return view("test",[
-            "authStatus"    => (bool)auth()->check(),
-            //    "user"          => auth()->user(),
-            "user"          => User::find(1),
-        ]);
+        dump(auth()->user());
+
+        dump(User::find(1));
+
+        auth()->logout();
+
+
     }
 
 

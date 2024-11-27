@@ -26,13 +26,6 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('email')->primary();
-            $table->string('token');
-            $table->string('code')->nullable();
-            $table->timestamp('created_at')->nullable();
-        });
-
         Schema::create('sessions', function (Blueprint $table) {
             $table->string('id')->primary();
             $table->foreignId('user_id')->nullable()->index();
@@ -41,6 +34,33 @@ return new class extends Migration
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
+
+
+        Schema::create('notifications', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('uid');
+            $table->string('code')->nullable();
+            $table->enum('type', ['success', 'info', 'warning', 'danger', 'secondary'])->default('secondary');
+            $table->enum('permanent', ['yes', 'no'])->default('no');
+            $table->longText('message')->nullable();
+            $table->timestamps();
+
+            $table->foreign('uid')->references('id')->on('users')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+        });
+
+        Schema::create('users_tokens', function (Blueprint $table) {
+            $table->id();
+            $table->string('email');
+            $table->string('token', 32)->unique();
+            $table->string('code')->nullable();
+            $table->timestamps();
+
+            $table->foreign('email')->references('email')->on('users')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+        });
     }
 
     /**
@@ -48,8 +68,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
-        Schema::dropIfExists('password_reset_tokens');
+        Schema::dropIfExists('notifications');
+        Schema::dropIfExists('users_tokens');
         Schema::dropIfExists('sessions');
+        Schema::dropIfExists('users');
     }
 };

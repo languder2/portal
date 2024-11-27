@@ -6,6 +6,8 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminServiceController;
+use Illuminate\Support\Facades\Session;
+
 
 use App\Models\User;
 
@@ -35,13 +37,29 @@ Route::controller(AccountController::class)->prefix("account")->group(function (
     Route::get("register",function(){return "register";})->name("register");
 
     Route::view("pass-recovery","pages.public.account",[
-        "form"  => view("account.public.forms.pass-recovery",[]),
-        "headTitle" => 'Портал ФГБОУ ВО "МелГУ": Восстановление пароля'
+        "form"              => view("account.public.forms.pass-recovery",[]),
+        "headTitle"         => 'Портал ФГБОУ ВО "МелГУ": Восстановление пароля'
     ])->name("pass.recovery");
 
     Route::post("pass/recovery/create","passRecoveryCreate")->name("pass-recovery-create-token");
 
     Route::get("pass-recovery/{token}","passRecoveryConfirm")->name("pass.recovery.token");
+
+    Route::get("change-password",function(){
+
+        if(Session::missing("ChangePassAvailable") and !auth()->check())
+            return redirect(route("home"));
+
+        return view("pages.public.account",[
+            "form"          => view("account.public.forms.change-password",[]),
+            "headTitle"     => 'Портал ФГБОУ ВО "МелГУ": Смена пароля'
+        ]);
+    })->name("change-password");
+
+    Route::post("change-password","changePassword")->name("change-password-processing");
+
+    Route::get("password/generate","passwordGenerate")->name("password-generate");
+
 
     Route::middleware("auth.check")->group(function () {
         Route::get("","page")->name("account");
@@ -75,11 +93,10 @@ Route::controller(AuthController::class)->prefix("account")->group(function () {
         auth()->logout();
         return redirect("/");
     })->name('logout');
-
-    Route::view('r',                "404");
 });
 
 Route::controller(AdminServiceController::class)->prefix("as")->group(function () {
     Route::get('truncate/{table}',            "truncate")->name('as.truncate');
 });
+
 

@@ -36,21 +36,14 @@
 
         <p class="text-center my-2">
             Нет аккаунта?
-            <a  href    = "{{url(route('register'))}}"
-                class   = "text-baseRed hover:text-red-700 active:text-gray-700"
-            >
-                Зарегистрируйтесь
-            </a>
+            <x-html.a link="{{url(route('register'))}}" text="Зарегистрируйтесь"/>
         </p>
 
         <p class="text-center my-2">
             Вспомнили - попробуйте
-            <a  href    = "{{url(route('home'))}}"
-                class   = "text-baseRed hover:text-red-700 active:text-gray-700"
-            >
-                войти
-            </a>
+            <x-html.a link="{{url(route('home'))}}" text="войти"/>
         </p>
     </form>
-
 </section>
+-
+.
