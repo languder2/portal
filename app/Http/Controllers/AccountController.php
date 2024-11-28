@@ -137,8 +137,10 @@ class AccountController extends Controller
 
         if($generate = $request->get("passGenerate")){
 
-            $pass = User::createPassword($user);
+            $pass = User::createPassword();
 
+            $user->password = bcrypt($pass);
+            $user->save();
 
             SendEmailJob::dispatch((object)[
                 "template"      => "emails.account.pass-generated",
@@ -146,6 +148,7 @@ class AccountController extends Controller
                 "user"          => $user,
                 "pass"          => $pass
             ]);
+
 
             return redirect()->route("message")->with([
                 "message"   =>  view("messages.account.new-pass-generated",[])->render()
@@ -156,7 +159,7 @@ class AccountController extends Controller
 
         $validation = $request->validate(
             [
-                "newPass"               => "required|confirmed:newPassConfirm|regex:'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*#?&-])[A-Za-z\d@$!%*#?&-]{8,}$'",
+                "newPass"               => "required|confirmed:newPassConfirm|regex:'^(?=.*[!@#$%&*()_+\-=])(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$'",
             ],
             [
                 'newPass.required'      => 'Не указан новый пароль',
@@ -195,9 +198,111 @@ class AccountController extends Controller
 
     }
 
-    public function passwordGenerate()
+    public function registration(Request $request)
     {
-        dd("passwordGenerate");
+
+        User::where("email",$request->get("email"))->delete();
+
+        $rules          = [
+            "password"              => "required|confirmed:confirm|regex:'^(?=.*[!@#$%&*()_+\-=])(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$'",
+            "email"                 => "required|unique:users,email|regex:'^[a-zA-Z0-9_.+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,6}$'",
+            "lastname"              => "required",
+            "firstname"             => "required",
+            "middlename"            => "",
+        ];
+
+        $messages       = [
+            'password.regex'        => 'Пароль не соответствует требованиям',
+            'email.required'        => 'E-mail не указан',
+            'email.regex'           => 'E-mail указан не корректно',
+            'email.unique'          => 'E-mail уже занят',
+            'lastname.required'     => 'Фамилия не указана',
+            'firstname.required'    => 'Имя не указано',
+            'password.required'     => 'Не указан новый пароль',
+            'password.confirmed'    => 'Пароль и подтверждение не совпадают',
+        ];
+
+        if(request()->exists("passGenerate")){
+            $pass = User::createPassword();
+            unset($rules['password']);
+        }
+
+        $form = (object)$request->validate($rules,$messages);
+
+        $form->password = bcrypt($pass??$form->password);
+
+        $user = User::create((array)$form);
+
+        do
+            $token = Str::random(32);
+        while(Token::where("token",$token)->exists());
+
+        Token::updateOrCreate(
+            [
+                "email"     => $user->email,
+            ],
+            [
+                "token"     => $token,
+                "email"     => $user->email,
+                "code"      => "registration"
+            ]
+        );
+
+        SendEmailJob::dispatch((object)[
+            "template"      => "emails.account.registration",
+            "subject"       => "Регистрация на портале ФГБОУ ВО \"МелГУ\"",
+            "user"          => $user,
+            "pass"          => &$pass,
+            "token"         => $token,
+            "date"          => Carbon::now( 'Europe/Moscow')->addHours(24)->format('d.m.Y H:i:s'),
+        ]);
+
+        Notification::updateOrCreate(
+            [
+                "code"  => "verification-required",
+                "uid"   => $user->id,
+            ],
+            [
+                "code"      => "verification-required",
+                "uid"       => $user->id,
+                "type"      => "warning",
+                "permanent" => "yes",
+                "message"   => "Требуется подтверждение почты"
+            ]
+        );
+
+        return redirect()->route("message")->with([
+            "message"   =>  view("messages.account.registration-success",[
+                "email" => $user->email,
+                "pass"  => $pass,
+                "date"  => Carbon::now( 'Europe/Moscow')->addHours(24)->format('d.m.Y H:i:s')
+            ])->render()
+        ]);
+    }
+
+    public function emailVerified($token)
+    {
+        $token  = Token::where("updated_at",">", Carbon::now()->subHours(24))
+            ->where("token",$token)
+            ->first();
+
+
+        if(is_null($token))
+            return redirect()->route("message")->with([
+                "message"   => view("messages.account.email-verified-token-invalid")->render()
+            ]);
+
+        $user   = User::where("email",$token->email)->first();
+
+        $user->email_verified_at    = Carbon::now();
+        $user->save();
+
+        $token->delete();
+
+        return redirect()->route("message")->with([
+            "message"   =>  view("messages.account.email-verified-success",[
+            ])->render()
+        ]);
     }
 
     public function page():View

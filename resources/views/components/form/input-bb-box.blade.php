@@ -1,8 +1,8 @@
 <div class="relative input-box z-0 w-full mb-5 group">
-    <input type         = "{{$type??"text"}}"
-           name         = "{{@$name}}"
-           id           = "{{@$id}}"
-           class        = "
+    <input  type         = "{{$type??"text"}}"
+            name         = "{{@$name}}"
+            id           = "{{@$id}}"
+            class        = "
                     block py-2.5 px-0 w-full
                     bg-transparent
                     text-sm text-gray-900
@@ -12,36 +12,40 @@
                     peer
                     {{@$class}}
                     "
-           placeholder  = ""
+            placeholder  = ""
 
-           @if(isset($minlength))
-               minlength="{{@$minlength}}"
-           @endif
+            @if(isset($minlength))
+                minlength="{{@$minlength}}"
+            @endif
 
-           @if(isset($pattern))
+            @if(isset($pattern))
                pattern="{{@$pattern}}"
-           @endif
+            @endif
 
-           @if(isset($value))
+            @if(isset($value))
                value="{{@$value}}"
-           @endif
+            @endif
 
-           autocomplete="off"
+            @if(isset($autocomplete))
+                autocomplete="{{$autocomplete}}"
+            @endif
 
-           @if(isset($pattern))
+            @if(isset($pattern))
                pattern="{{@$pattern}}"
-           @endif
+            @endif
 
-           @if(isset($minlength))
+            @if(isset($minlength))
                minlength="{{@$minlength}}"
-           @endif
+            @endif
 
-           @if(isset($required))
+            @disabled(!empty($disabled))
+
+            @if(isset($required))
                required
-           @endif
+            @endif
     />
-    <label for          = "{{@$id}}"
-           class        ="
+    <label  for         = "{{@$id}}"
+            class       ="
                     absolute
                     text-sm
                     text-gray-500
@@ -56,8 +60,7 @@
                     peer-focus:font-medium
                     peer-focus:start-0
                     peer-focus:text-blue-600
-           ">
+            ">
         {{@$label}}
     </label>
-
 </div>

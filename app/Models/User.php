@@ -26,6 +26,7 @@ class User extends Authenticatable
         'middlename',
         'lastname',
         'password',
+        'email_verified_at',
     ];
 
     /**
@@ -51,8 +52,9 @@ class User extends Authenticatable
         ];
     }
 
-    public static function createPassword($user,$length = 12):string
+    public static function createPassword($length = 12):string
     {
+
         $symbolsTypes       =[
             "lowercase","uppercase","numbers"
         ];
@@ -63,24 +65,22 @@ class User extends Authenticatable
             "specialChars"       => '!@#$%^&*',
         ];
 
-        do{
-            $pass= "";
-            for($i=1;$i<=$length;$i++){
-                $symbolSet = $symbols[$symbolsTypes[rand(0,2)]];
+        $pass = self::getSymbol($symbols['uppercase']);
+        $pass.= self::getSymbol($symbols['lowercase']);
+        $pass.= self::getSymbol($symbols['numbers']);
 
-                $pass.= $symbolSet[rand(0,strlen($symbolSet)-1)];
+        for($i=0;$i<$length-3;$i++){
+            if($i%3 === 0) $pass.= "-";
 
-                if($i%3 ===0 and $i!=$length)
-                    $pass.= "-";
-            }
+            $pass.= self::getSymbol($symbols[$symbolsTypes[rand(0,2)]]);
         }
-        while(preg_match('^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*#?&-])[A-Za-z\d@$!%*#?&-]{8,}$^', $pass));
-
-
-        $user->password = bcrypt($pass);
-        $user->save();
 
         return $pass;
+    }
+
+    public static function getSymbol($string):string
+    {
+        return $string[rand(0,strlen($string)-1)];
     }
 
 }

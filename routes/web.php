@@ -2,11 +2,11 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AccountController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminServiceController;
 use Illuminate\Support\Facades\Session;
+use App\Http\Controllers\AccountController;
 
 
 use App\Models\User;
@@ -34,7 +34,14 @@ Route::get("message",function(){
 Route::controller(AccountController::class)->prefix("account")->group(function () {
     Route::post("login","auth")->name("auth");
 
-    Route::get("register",function(){return "register";})->name("register");
+    Route::view("registration","pages.public.account",[
+        "form"              => view("account.public.forms.registration",[]),
+        "headTitle"         => 'Портал ФГБОУ ВО "МелГУ": Регистрация'
+    ])->name("registration");
+
+    Route::post("registration","registration")->name("registration-processing");
+
+    Route::get("verified/{token}","emailVerified")->name("account.verified");
 
     Route::view("pass-recovery","pages.public.account",[
         "form"              => view("account.public.forms.password-recovery",[]),

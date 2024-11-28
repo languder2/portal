@@ -36,7 +36,7 @@
 
         <p class="text-center my-2">
             Нет аккаунта?
-            <x-html.a link="{{url(route('register'))}}" text="Зарегистрируйтесь"/>
+            <x-html.a link="{{url(route('registration'))}}" text="Зарегистрируйтесь"/>
         </p>
 
         <p class="text-center my-2">

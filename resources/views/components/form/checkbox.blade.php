@@ -18,7 +18,7 @@
             focus:ring-baseRed focus:ring-2
             cursor-pointer
         "
-        @checked(old('form.remember'))
+        @checked(old($name))
 
         @if(isset($dataOptions))
             {!! $dataOptions !!}

@@ -7,8 +7,8 @@ document.addEventListener("DOMContentLoaded",function (){
 
 function setPasswordGenerate(el){
 
-    let password = document.getElementById("newPassword")
-    let confirm = document.getElementById("newPassConfirm")
+    let password = document.getElementById("Password")
+    let confirm = document.getElementById("PassConfirm")
 
 
     el.addEventListener("change",()=>{
