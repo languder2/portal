@@ -28,6 +28,14 @@
 
            autocomplete="off"
 
+           @if(isset($pattern))
+               pattern="{{@$pattern}}"
+           @endif
+
+           @if(isset($minlength))
+               minlength="{{@$minlength}}"
+           @endif
+
            @if(isset($required))
                required
            @endif

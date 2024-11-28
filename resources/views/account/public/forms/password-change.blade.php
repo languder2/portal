@@ -13,9 +13,7 @@
 
         <p class="mb-4">
             Укажите новый пароль и подтвердите его.<br>
-            Или пусть система
-            <x-html.a link="{{url(route('password-generate'))}}" text="сгенерирует"/>
-            его и вышлет на почту.
+            Или предоставьте системе сгенерировать его.
         </p>
 
         @if(!is_null($errors) && $errors->all())
@@ -48,14 +46,26 @@
             required
         />
 
-        <div class="text-right">
-            <x-form.button
-                value="Сменить"
+        <div class="flex justify-between">
+            <x-form.checkbox
+                id="passwordGenerate"
+                name="passGenerate"
+                text="Сгенерировать пароль"
+                dataOptions="
+                    data-link-generate={{url(route('password-generate'))}}
+                    data-link-set={{url(route('change-password-processing'))}}
+                "
             />
+            <div class="text-right">
+                <x-form.button
+                    value="Сменить"
+                />
+            </div>
         </div>
 
+        <x-html.a link="{{url(route('password-generate'))}}" text="сгенерирует"/>
 
-        <p class="font-bold">
+        <p class="font-bold mt-2">
             Требования к паролю:
         </p>
         <ul class="list-disc ml-8">

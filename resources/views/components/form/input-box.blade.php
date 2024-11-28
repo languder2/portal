@@ -12,7 +12,18 @@
                     focus:outline-none focus:ring-0 focus:border-blue-600
                     peer                    "
            placeholder  = ""
-           value="{{@$value}}"
+           @if(isset($value))
+               value="{{@$value}}"
+           @endif
+
+           @if(isset($pattern))
+               pattern="{{@$pattern}}"
+           @endif
+
+           @if(isset($minlength))
+               minlength="{{@$minlength}}"
+           @endif
+
            @if(isset($required))
                required
            @endif
