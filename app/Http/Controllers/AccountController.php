@@ -120,6 +120,40 @@ class AccountController extends Controller
 
     public function changePassword(Request $request)
     {
+
+        /* Get user */
+
+        if(Session::exists("ChangePassAvailable"))
+            $user = User::where("email",Session::get("ChangePassAvailable"))->first();
+
+        elseif(auth()->check())
+            $user = auth()->user();
+
+        else
+            return redirect(route("home"));
+
+
+        /* Generated Password */
+
+        if($generate = $request->get("passGenerate")){
+
+            $pass = User::createPassword($user);
+
+
+            SendEmailJob::dispatch((object)[
+                "template"      => "emails.account.pass-generated",
+                "subject"       => "Восстановление доступа на портале ФГБОУ ВО \"МелГУ\"",
+                "user"          => $user,
+                "pass"          => $pass
+            ]);
+
+            return redirect()->route("message")->with([
+                "message"   =>  view("messages.account.new-pass-generated",[])->render()
+            ]);
+        }
+
+        /* Set Password */
+
         $validation = $request->validate(
             [
                 "newPass"               => "required|confirmed:newPassConfirm|regex:'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*#?&-])[A-Za-z\d@$!%*#?&-]{8,}$'",
@@ -130,16 +164,6 @@ class AccountController extends Controller
                 'newPass.regex'         => 'Пароль не соответствует требованиям',
             ]
         );
-
-
-        if(Session::exists("ChangePassAvailable"))
-            $user = User::where("email",Session::get("ChangePassAvailable"))->first();
-
-        elseif(auth()->check())
-            $user = auth()->user();
-        else
-            return redirect(route("home"));
-
 
         $user->update([
             "password"  => bcrypt($validation['newPass'])
@@ -173,7 +197,6 @@ class AccountController extends Controller
 
     public function passwordGenerate()
     {
-
         dd("passwordGenerate");
     }
 

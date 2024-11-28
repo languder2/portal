@@ -37,7 +37,7 @@ Route::controller(AccountController::class)->prefix("account")->group(function (
     Route::get("register",function(){return "register";})->name("register");
 
     Route::view("pass-recovery","pages.public.account",[
-        "form"              => view("account.public.forms.pass-recovery",[]),
+        "form"              => view("account.public.forms.password-recovery",[]),
         "headTitle"         => 'Портал ФГБОУ ВО "МелГУ": Восстановление пароля'
     ])->name("pass.recovery");
 
@@ -51,7 +51,7 @@ Route::controller(AccountController::class)->prefix("account")->group(function (
             return redirect(route("home"));
 
         return view("pages.public.account",[
-            "form"          => view("account.public.forms.change-password",[]),
+            "form"          => view("account.public.forms.password-change",[]),
             "headTitle"     => 'Портал ФГБОУ ВО "МелГУ": Смена пароля'
         ]);
     })->name("change-password");

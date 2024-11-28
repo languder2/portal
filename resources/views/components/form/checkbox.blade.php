@@ -19,6 +19,10 @@
             cursor-pointer
         "
         @checked(old('form.remember'))
+
+        @if(isset($dataOptions))
+            {!! $dataOptions !!}
+        @endif
     >
     <label
         @if(isset($id))
