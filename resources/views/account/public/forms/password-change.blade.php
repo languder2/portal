@@ -63,8 +63,6 @@
             </div>
         </div>
 
-        <x-html.a link="{{url(route('password-generate'))}}" text="сгенерирует"/>
-
         <p class="font-bold mt-2">
             Требования к паролю:
         </p>
