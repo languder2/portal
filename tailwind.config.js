@@ -24,7 +24,7 @@ export default {
             },
             colors: {
                 baseRed     : '#820000',
-                test        : '#777700'
+                test        : '#777700',
             },
         },
     },

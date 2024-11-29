@@ -3,17 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\SendEmailJob;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
-use App\Models\User;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Str;
+use App\Models\{Notification,Token,User,Role};
+use Illuminate\Http\{JsonResponse,RedirectResponse,Request};
+use Illuminate\Support\{Carbon,Str,Facades\Session};
 use Illuminate\View\View;
-use App\Models\Token;
-use App\Models\Notification;
-
 
 class AccountController extends Controller
 {
@@ -94,9 +87,9 @@ class AccountController extends Controller
         ]);
 
         return redirect()->route("message")->with([
-                "message"   =>  view("messages.account.pass-recovery-send",[
-                    "email" => $user->email,
-                ])->render()
+            "message"   =>  view("messages.account.pass-recovery-send",[
+                "email" => $user->email,
+            ])->render()
         ]);
     }
 
@@ -265,7 +258,7 @@ class AccountController extends Controller
             [
                 "code"      => "verification-required",
                 "uid"       => $user->id,
-                "type"      => "warning",
+                "type"      => "danger",
                 "permanent" => "yes",
                 "message"   => "Требуется подтверждение почты"
             ]
@@ -305,10 +298,34 @@ class AccountController extends Controller
         ]);
     }
 
-    public function page():View
+    public function page():View|RedirectResponse
     {
-        return view("pages.public.account");
+        $user           = User::find(auth()->user()->getAuthIdentifier());
+
+        $user->roles    = Role::where("uid",$user->id)->get();
+
+        $notifications  = Notification::where("uid",$user->id)
+            ->orderByRaw("
+                CASE type
+                    WHEN 'danger'   THEN 1
+                    WHEN 'warning'  THEN 2
+                    WHEN 'success'  THEN 3
+                    WHEN 'info'     THEN 4
+                    ELSE 5
+                    END
+            ")
+            ->get();
+
+        $sections = [
+            "notifications"     => view("sections.public.notifications",
+                [
+                    "list"          => $notifications,
+                ])->render(),
+
+        ];
+
+        return view("pages.public.account",[
+            "sections"          => $sections,
+        ]);
     }
-
-
 }

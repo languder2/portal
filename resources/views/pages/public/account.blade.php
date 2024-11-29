@@ -10,6 +10,12 @@
         {!! @$form !!}
     @endif
 
+    @if(isset($sections) && is_array($sections))
+        @foreach($sections as $section)
+            {!! $section !!}
+        @endforeach
+    @endif
+
     @if(isset($contents) && is_array($contents))
         @foreach($contents as $content)
             {!! $content !!}

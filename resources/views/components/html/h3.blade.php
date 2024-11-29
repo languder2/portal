@@ -1,5 +1,7 @@
 <h3 class = "
-    border-b mb-4 pb-1 text-xl
+    border-b mb-3 pb-3 text-xl
+    relative
+    clear-both
     @if(isset($class)){{$class}}@endif
 ">
     {{@$text}}

@@ -568,7 +568,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function publicPath($path = '')
     {
-        return $this->joinPaths($this->publicPath ?: $this->basePath('public'), $path);
+        return $this->joinPaths($this->publicPath ?: $this->basePath(Env::get("APP_PUBLIC_PATH")), $path);
     }
 
     /**

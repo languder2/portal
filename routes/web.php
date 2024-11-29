@@ -1,15 +1,10 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TestController;
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminServiceController;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\AccountController;
-
-
-use App\Models\User;
 
 Route::get('/', function () {
 
@@ -30,6 +25,8 @@ Route::get("message",function(){
     return view("pages.public.message",["message" => session('message')]);
 })->name("message");
 
+
+Route::redirect('login', 'account/login');
 
 Route::controller(AccountController::class)->prefix("account")->group(function () {
     Route::post("login","auth")->name("auth");
@@ -71,7 +68,12 @@ Route::controller(AccountController::class)->prefix("account")->group(function (
     Route::middleware("auth.check")->group(function () {
         Route::get("","page")->name("account");
     });
- });
+
+    Route::get('logout',           function (){
+        auth()->logout();
+        return redirect("/");
+    })->name('logout');
+});
 
 Route::controller(TestController::class)->prefix("test")->group(function () {
 
@@ -89,17 +91,6 @@ Route::controller(TestController::class)->prefix("test")->group(function () {
         return dump(auth()->user());
     });
 
-});
-
-Route::redirect('login', 'account/login');
-
-Route::controller(AuthController::class)->prefix("account")->group(function () {
-    Route::view('login',            "login")->name('login');
-
-    Route::get('logout',           function (){
-        auth()->logout();
-        return redirect("/");
-    })->name('logout');
 });
 
 Route::controller(AdminServiceController::class)->prefix("as")->group(function () {

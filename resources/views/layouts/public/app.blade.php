@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Default Title')</title>
-
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gray-200">
@@ -12,7 +11,7 @@
 
 @yield('menu')
 
-<main class="mt-4 ml-0 md:ml-19rem">
+<main class="mt-4 mx-4 md:ml-19rem">
     @yield('content')
 </main>
 
