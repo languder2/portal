@@ -1,4 +1,4 @@
-<section class="mt-4 ml-0 px-4 py-4 bg-white rounded-l-md">
+<section class="mt-4 ml-0 px-4 py-4 bg-white rounded-md">
     <p>
         Добро пожаловать на портал ФГБОУ ВО "МелГУ"
     </p>

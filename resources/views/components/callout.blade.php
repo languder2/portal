@@ -17,15 +17,5 @@
         @break
    @endswitch
 ">
-    <div class="font-bold text-gray-500">
-        {{$item->type}}
-    </div>
-    <div>
-        {{$item->code}}
-    </div>
-    <div>
-        {{$item->message}}
-    </div>
-
-
+        {!! $item->message !!}
 </div>

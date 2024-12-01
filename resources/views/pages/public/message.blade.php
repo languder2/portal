@@ -5,7 +5,7 @@
 @section('headTitle', 'Портал ФГБОУ ВО "МелГУ": Уведомление')
 
 @section('content')
-    <section class="bg-white p-4 rounded-l-md">
+    <section class="bg-white p-4 rounded-md">
         {!! @$message !!}
     </section>
 @endsection

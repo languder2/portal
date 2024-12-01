@@ -1,4 +1,4 @@
-<section class="bg-white p-4 rounded-l-md">
+<section class="bg-white p-4 rounded-md">
     <form
         action          = "{{url(route("pass-recovery-create-token"))}}"
         method          = "POST"

@@ -14,6 +14,7 @@ class Notification extends Model
         'type',
         'permanent',
         'message',
+        'template',
         'created_at',
         'updated_at',
     ];

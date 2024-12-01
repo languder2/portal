@@ -43,74 +43,6 @@ class AccountController extends Controller
         auth()->login($user,isset($form->remember));
         return redirect(route("account"));
     }
-
-    public function passRecoveryCreate(Request $request):RedirectResponse|string
-    {
-        $validation = $request->validate(
-            [
-                "form.email"                => "required|email",
-            ],
-            [
-                'form.email.required'       => 'Укажите Ваш Email',
-            ]
-        );
-
-        $form = (object)$validation['form'];
-
-        $user = User::where("email",$form->email)->first();
-
-        if(is_null($user))
-            return redirect()->back()->withInput()->withErrors([
-                "msg"   => view("messages.account.user-not-found")->render()
-            ]);
-
-        do
-            $token = Str::random(32);
-        while(Token::where("token",$token)->exists());
-
-        Token::updateOrCreate(
-            [
-                "email"     => $user->email,
-            ],
-            [
-                "token"     => $token,
-                "email"     => $user->email,
-                "code"      => "pass-recovery"
-            ]
-        );
-
-        SendEmailJob::dispatch((object)[
-            "template"      => "emails.account.pass-recovery",
-            "subject"       => "Восстановление доступа на портале ФГБОУ ВО \"МелГУ\"",
-            "user"          => $user,
-            "token"         => $token
-        ]);
-
-        return redirect()->route("message")->with([
-            "message"   =>  view("messages.account.pass-recovery-send",[
-                "email" => $user->email,
-            ])->render()
-        ]);
-    }
-
-    public function passRecoveryConfirm($token)
-    {
-        $token = Token::where("updated_at",">", Carbon::now()->subHours(3))
-            ->where("token",$token)
-            ->first();
-
-        if(is_null($token))
-            return redirect()->route("message")->with([
-                "message"   => view("messages.account.pass-recovery-invalid-token")->render()
-            ]);
-
-        Session::put("ChangePassAvailable",$token->email);
-
-        $token->delete();
-
-        return redirect(route("change-password"));
-    }
-
     public function changePassword(Request $request)
     {
 
@@ -142,6 +74,23 @@ class AccountController extends Controller
                 "pass"          => $pass
             ]);
 
+            if(!auth()->check())
+                Notification::updateOrCreate(
+                    [
+                        'code'      => 'password:change',
+                        'uid'       => $user->id,
+                    ],
+                    [
+                        'code'      => 'password:change',
+                        'type'      => 'success',
+                        'uid'       => $user->id,
+                        'message'   => json_encode(['email'=>$user->email],JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT),
+                        'template'  => 'notifications.account-password-created',
+                    ]
+                );
+
+            if(auth()->check())
+                return redirect(route("account"));
 
             return redirect()->route("message")->with([
                 "message"   =>  view("messages.account.new-pass-generated",[])->render()
@@ -176,21 +125,168 @@ class AccountController extends Controller
 
         Notification::updateOrCreate(
             [
-                "code"  => "save-password",
-                "uid"   => $user->id,
+                "code"      => "password:change",
+                "uid"       => $user->id,
             ],
             [
-                "code"      => "save-password",
+                "code"      => "password:change",
                 "type"      => "success",
                 "uid"       => $user->id,
-                "message"   => "Новый пароль сохранен"
+                "message"   => "Новый пароль задан",
+                'template'  => null,
             ]
         );
 
         return redirect()->route("account");
 
     }
+    public function emailVerified($token)
+    {
+        $token  = Token::where('updated_at','>', Carbon::now()->subHours(24))
+            ->where([
+                'code'      => 'verification:email',
+                'token'     => $token,
+            ])
+            ->first();
 
+        if(is_null($token))
+            return redirect()->route("message")->with([
+                "message"   => view("messages.account.email-verified-token-invalid")->render()
+            ]);
+
+        $user   = User::where("email",$token->email)->first();
+
+        $user->email_verified_at    = Carbon::now();
+        $user->save();
+
+        $token->delete();
+        Notification::where([
+            "code"          => "email:verification required",
+            "uid"           => $user->id,
+        ])->delete();
+
+        return redirect()->route("message")->with([
+            "message"   =>  view("messages.account.email-verified-success",[
+            ])->render()
+        ]);
+    }
+    public function page():View|RedirectResponse
+    {
+        $user           = User::find(auth()->user()->getAuthIdentifier());
+
+        $user->roles    = Role::where("uid",$user->id)->get();
+
+        $notifications  = Notification::where("uid",$user->id)
+            ->orderByRaw("
+
+                CASE permanent
+                    WHEN 'no'   THEN 1
+                    WHEN 'yes'  THEN 2
+                    ELSE 3
+                END
+                , CASE type
+                    WHEN 'danger'   THEN 1
+                    WHEN 'warning'  THEN 2
+                    WHEN 'success'  THEN 3
+                    WHEN 'info'     THEN 4
+                    ELSE 5
+                END
+            ")
+            ->get();
+
+        foreach ($notifications as $notification) {
+            if ($notification->permanent === "no")
+                $notification->delete();
+
+            if ($notification->template !== null)
+                if (view()->exists($notification->template))
+                    $notification->message = view($notification->template, [
+                        'data' => json_decode($notification->message)
+                    ])->render();
+        }
+
+        $sections = [
+            "notifications"     => view("sections.public.notifications",
+                [
+                    "list"          => $notifications,
+                ])->render(),
+
+        ];
+
+        return view("pages.public.account",[
+            "sections"          => $sections,
+        ]);
+    }
+    public function passRecoveryConfirm($token)
+    {
+        $token = Token::where("updated_at",">", Carbon::now()->subHours(3))
+            ->where(
+                [
+                    'code'      => 'password:recovery',
+                    'token'     => $token,
+                ]
+            )
+            ->first();
+
+        if(is_null($token))
+            return redirect()->route("message")->with([
+                "message"   => view("messages.account.pass-recovery-invalid-token")->render()
+            ]);
+
+        Session::put("ChangePassAvailable",$token->email);
+
+        $token->delete();
+
+        return redirect(route("change-password"));
+    }
+    public function passRecoveryCreate(Request $request):RedirectResponse|string
+    {
+        $validation = $request->validate(
+            [
+                "form.email"                => "required|email",
+            ],
+            [
+                'form.email.required'       => 'Укажите Ваш Email',
+            ]
+        );
+
+        $form = (object)$validation['form'];
+
+        $user = User::where("email",$form->email)->first();
+
+        if(is_null($user))
+            return redirect()->back()->withInput()->withErrors([
+                "msg"   => view("messages.account.user-not-found")->render()
+            ]);
+
+        do
+            $token = Str::random(32);
+        while(Token::where("token",$token)->exists());
+
+        Token::updateOrCreate(
+            [
+                "email"     => $user->email,
+            ],
+            [
+                "token"     => $token,
+                "email"     => $user->email,
+                "code"      => 'password:recovery'
+            ]
+        );
+
+        SendEmailJob::dispatch((object)[
+            "template"      => "emails.account.pass-recovery",
+            "subject"       => "Восстановление доступа на портале ФГБОУ ВО \"МелГУ\"",
+            "user"          => $user,
+            "token"         => $token
+        ]);
+
+        return redirect()->route("message")->with([
+            "message"   =>  view("messages.account.pass-recovery-send",[
+                "email" => $user->email,
+            ])->render()
+        ]);
+    }
     public function registration(Request $request)
     {
 
@@ -226,106 +322,27 @@ class AccountController extends Controller
 
         $user = User::create((array)$form);
 
-        do
-            $token = Str::random(32);
-        while(Token::where("token",$token)->exists());
-
-        Token::updateOrCreate(
-            [
-                "email"     => $user->email,
-            ],
-            [
-                "token"     => $token,
-                "email"     => $user->email,
-                "code"      => "registration"
-            ]
-        );
-
-        SendEmailJob::dispatch((object)[
-            "template"      => "emails.account.registration",
-            "subject"       => "Регистрация на портале ФГБОУ ВО \"МелГУ\"",
-            "user"          => $user,
-            "pass"          => &$pass,
-            "token"         => $token,
-            "date"          => Carbon::now( 'Europe/Moscow')->addHours(24)->format('d.m.Y H:i:s'),
-        ]);
-
-        Notification::updateOrCreate(
-            [
-                "code"  => "verification-required",
-                "uid"   => $user->id,
-            ],
-            [
-                "code"      => "verification-required",
-                "uid"       => $user->id,
-                "type"      => "danger",
-                "permanent" => "yes",
-                "message"   => "Требуется подтверждение почты"
-            ]
-        );
+        User::sendEmailVerification($user,$pass??null);
 
         return redirect()->route("message")->with([
             "message"   =>  view("messages.account.registration-success",[
                 "email" => $user->email,
-                "pass"  => $pass,
+                "pass"  => &$pass,
                 "date"  => Carbon::now( 'Europe/Moscow')->addHours(24)->format('d.m.Y H:i:s')
             ])->render()
         ]);
     }
-
-    public function emailVerified($token)
+    public function resendEmailVerification():RedirectResponse
     {
-        $token  = Token::where("updated_at",">", Carbon::now()->subHours(24))
-            ->where("token",$token)
-            ->first();
+        $user =  User::find(auth()->user()->getAuthIdentifier());
 
-
-        if(is_null($token))
-            return redirect()->route("message")->with([
-                "message"   => view("messages.account.email-verified-token-invalid")->render()
-            ]);
-
-        $user   = User::where("email",$token->email)->first();
-
-        $user->email_verified_at    = Carbon::now();
-        $user->save();
-
-        $token->delete();
-
-        return redirect()->route("message")->with([
-            "message"   =>  view("messages.account.email-verified-success",[
-            ])->render()
+        Notification::create([
+            'uid'               => $user->id,
+            'type'              => 'success',
+            'permanent'         => 'no',
+            'message'           => $user->email,
+            'template'          => '',
         ]);
-    }
-
-    public function page():View|RedirectResponse
-    {
-        $user           = User::find(auth()->user()->getAuthIdentifier());
-
-        $user->roles    = Role::where("uid",$user->id)->get();
-
-        $notifications  = Notification::where("uid",$user->id)
-            ->orderByRaw("
-                CASE type
-                    WHEN 'danger'   THEN 1
-                    WHEN 'warning'  THEN 2
-                    WHEN 'success'  THEN 3
-                    WHEN 'info'     THEN 4
-                    ELSE 5
-                    END
-            ")
-            ->get();
-
-        $sections = [
-            "notifications"     => view("sections.public.notifications",
-                [
-                    "list"          => $notifications,
-                ])->render(),
-
-        ];
-
-        return view("pages.public.account",[
-            "sections"          => $sections,
-        ]);
+        return redirect()->back();
     }
 }

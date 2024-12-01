@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Jobs\SendEmailJob;
 use App\Mail\SendEmail;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -97,6 +98,7 @@ class TestController extends Controller
 
     public function test()
     {
+/*
         auth()->loginUsingId(1);
 
         dump(auth()->user());
@@ -104,8 +106,7 @@ class TestController extends Controller
         dump(User::find(1));
 
         auth()->logout();
-
-
+*/
     }
 
 

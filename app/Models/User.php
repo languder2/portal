@@ -3,11 +3,14 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Jobs\SendEmailJob;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
@@ -81,6 +84,50 @@ class User extends Authenticatable
     public static function getSymbol($string):string
     {
         return $string[rand(0,strlen($string)-1)];
+    }
+
+    public static function sendEmailVerification(User $user,?string $pass):bool
+    {
+        do
+            $token = Str::random(32);
+        while(Token::where('token',$token)->exists());
+
+        Token::updateOrCreate(
+            [
+                'email'     => $user->email,
+            ],
+            [
+                'token'     => $token,
+                'email'     => $user->email,
+                'code'      => 'verification:email'
+            ]
+        );
+
+        SendEmailJob::dispatch((object)[
+            "template"          => "emails.account.registration",
+            "subject"           => "Регистрация на портале ФГБОУ ВО \"МелГУ\"",
+            "user"              => $user,
+            "pass"              => &$pass,
+            "token"             => $token,
+            "date"              => Carbon::now( 'Europe/Moscow')->addHours(24)->format('d.m.Y H:i:s'),
+        ]);
+
+        Notification::updateOrCreate(
+            [
+                "code"          => "email:verification required",
+                "uid"           => $user->id,
+            ],
+            [
+                "code"          => "email:verification required",
+                "uid"           => $user->id,
+                "type"          => 'danger',
+                "permanent"     => 'yes',
+                "message"       => 'Требуется подтверждение почты',
+                "template"      => 'notifications.account-no-verification-email'
+            ]
+        );
+
+        return true;
     }
 
 }

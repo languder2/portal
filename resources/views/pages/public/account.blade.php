@@ -26,8 +26,3 @@
 @section('menu')
     @include("layouts.public.menu")
 @endsection
-
-
-{{--
-
---}}

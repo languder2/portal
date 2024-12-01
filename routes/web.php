@@ -5,6 +5,7 @@ use App\Http\Controllers\TestController;
 use App\Http\Controllers\AdminServiceController;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\AccountController;
+use App\Models\UserDetail;
 
 Route::get('/', function () {
 
@@ -24,6 +25,11 @@ Route::get("message",function(){
 
     return view("pages.public.message",["message" => session('message')]);
 })->name("message");
+
+Route::get('logout',           function (){
+    auth()->logout();
+    return redirect("/");
+})->name('logout');
 
 
 Route::redirect('login', 'account/login');
@@ -63,20 +69,47 @@ Route::controller(AccountController::class)->prefix("account")->group(function (
     Route::post("change-password","changePassword")->name("change-password-processing");
 
     Route::get("password/generate","passwordGenerate")->name("password-generate");
+});
 
-
-    Route::middleware("auth.check")->group(function () {
+Route::middleware("auth.check")
+    ->controller(AccountController::class)
+    ->prefix("account")
+    ->group(function (){
         Route::get("","page")->name("account");
-    });
 
-    Route::get('logout',           function (){
-        auth()->logout();
-        return redirect("/");
-    })->name('logout');
+        Route::get("resend-email-verification","resendEmailVerification")
+            ->name("resend-email-verification");
+
+        Route::get('personal',function(){
+            return view('pages.public.account',[
+                'contents'      => [
+                    view('sections.public.notifications',[
+
+                    ])->render(),
+                    view('account.public.panel.personal-base',[
+                        'user'      => auth()->user(),
+                        'detail'    => UserDetail::find(auth()->user()->getAuthIdentifier())
+                    ])->render(),
+                    view('account.public.panel.personal-identification',[
+                        'detail'    => UserDetail::find(auth()->user()->getAuthIdentifier())
+                    ])->render(),
+                    view('account.public.panel.personal-address',[
+                        'detail'    => UserDetail::find(auth()->user()->getAuthIdentifier())
+                    ])->render(),
+                ],
+                "headTitle"     => 'Портал ФГБОУ ВО "МелГУ": Персональные данные'
+            ]);
+        })->name('show:personal');
+
+        Route::view('personal/change','pages.public.account',[
+            "form"          => view("account.public.forms.personal",[]),
+            "headTitle"     => 'Портал ФГБОУ ВО "МелГУ": Персональные данные'
+        ])->name('change:personal');
+
+
 });
 
 Route::controller(TestController::class)->prefix("test")->group(function () {
-
     Route::get('',                  "test");
     Route::get("redis/set",         "redisSet");
     Route::get("redis/get",         "redisGet");
