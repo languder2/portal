@@ -14,6 +14,12 @@
                     "
             placeholder  = ""
 
+            @if(isset($datas) && is_array($datas))
+                @foreach($datas as $code=>$data)
+                    data-{{$code}}={{$data}}
+                @endforeach
+            @endif
+
             @if(isset($minlength))
                 minlength="{{@$minlength}}"
             @endif
@@ -40,9 +46,7 @@
 
             @disabled(!empty($disabled))
 
-            @if(isset($required))
-               required
-            @endif
+            @required(@$required)
     />
     <label  for         = "{{@$id}}"
             class       ="
@@ -61,6 +65,6 @@
                     peer-focus:start-0
                     peer-focus:text-blue-600
             ">
-        {{@$label}}
+        {{@$label}}@if(isset($required))<span class="text-red-700 font-semibold">*</span> @endif
     </label>
 </div>

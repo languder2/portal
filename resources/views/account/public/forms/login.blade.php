@@ -1,4 +1,7 @@
-<section class="bg-white p-4 rounded-md">
+<section class="
+        bg-white p-4 rounded-md
+        lg:max-w-content lg:mx-auto
+">
     <form
         action          = "{{url(route("auth"))}}"
         method          = "POST"
@@ -28,6 +31,7 @@
             required
             value="{{old('form.email')}}"
         />
+
         <x-form.input-bb-box
             type="password"
             name="form[password]"

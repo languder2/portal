@@ -22,6 +22,9 @@ export default {
             width: {
                 '18rem'     : '18rem',
             },
+            maxWidth: {
+                'content'   : '37.5rem',
+            },
             colors: {
                 baseRed     : '#820000',
                 test        : '#777700',

@@ -21,5 +21,6 @@ class UserDetail extends Model
         'inn',
         'sex',
         'birthday',
+        'phone',
     ];
 }

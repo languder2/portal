@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\SendEmailJob;
-use App\Models\{Notification,Token,User,Role};
+use App\Models\{Notification, Token, User, Role, UserDetail};
 use Illuminate\Http\{JsonResponse,RedirectResponse,Request};
 use Illuminate\Support\{Carbon,Str,Facades\Session};
 use Illuminate\View\View;
@@ -176,39 +176,11 @@ class AccountController extends Controller
 
         $user->roles    = Role::where("uid",$user->id)->get();
 
-        $notifications  = Notification::where("uid",$user->id)
-            ->orderByRaw("
-
-                CASE permanent
-                    WHEN 'no'   THEN 1
-                    WHEN 'yes'  THEN 2
-                    ELSE 3
-                END
-                , CASE type
-                    WHEN 'danger'   THEN 1
-                    WHEN 'warning'  THEN 2
-                    WHEN 'success'  THEN 3
-                    WHEN 'info'     THEN 4
-                    ELSE 5
-                END
-            ")
-            ->get();
-
-        foreach ($notifications as $notification) {
-            if ($notification->permanent === "no")
-                $notification->delete();
-
-            if ($notification->template !== null)
-                if (view()->exists($notification->template))
-                    $notification->message = view($notification->template, [
-                        'data' => json_decode($notification->message)
-                    ])->render();
-        }
 
         $sections = [
             "notifications"     => view("sections.public.notifications",
                 [
-                    "list"          => $notifications,
+                    "list"          => Notification::getList($user->id),
                 ])->render(),
 
         ];
@@ -345,4 +317,51 @@ class AccountController extends Controller
         ]);
         return redirect()->back();
     }
+
+    public function savePersonalBase(Request $request):RedirectResponse
+    {
+        $user       = User::find(auth()->user()->getAuthIdentifier());
+        $detail     = UserDetail::where('uid',$user->id)->first();
+
+        if($detail === null)
+            $detail         = UserDetail::create([
+                'uid'               => $user->id,
+            ]);
+
+        $userForm = $request->validate([
+            "lastname"              => "required",
+            "firstname"             => "required",
+            "middlename"            => "",
+            "email"                 => "required|unique:users,email,$user->id|regex:'^[a-zA-Z0-9_.+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,6}$'",
+        ]);
+
+        $detailForm = $request->validate([
+            'phone'                 => "",
+            'sex'                   => "",
+            'birthday'              => ""
+        ]);
+
+        if($user->email !== $userForm['email'])
+            $emailChanged = true;
+
+        $user->update($userForm);
+
+        $detail->update($detailForm);
+
+        Notification::updateOrCreate(
+            [
+                'code'      => 'save:personal-base',
+                'uid'       => $user->id,
+            ],
+            [
+                'code'      => 'save:personal-base',
+                'type'      => 'success',
+                'uid'       => $user->id,
+                'message'   => 'Персональные данные сохранены',
+            ]
+        );
+
+        return redirect()->route('show:personal');
+    }
+
 }
