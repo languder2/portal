@@ -1,4 +1,7 @@
-<section class="bg-white p-4 rounded-md mb-4 lg:max-w-[700px] lg:mx-auto">
+<section class="
+        bg-white p-4 rounded-md mb-4
+        lg:max-w-content lg:mx-auto
+">
     <x-html.h3 text="Паспортные данные"/>
 
     <div class="grid lg:grid-cols-5 gap-0 lg:gap-4">
@@ -34,7 +37,7 @@
 
     <hr class="my-2">
     <div class="text-right">
-        <x-html.a link="{{url(route('home'))}}" text="Редактировать" class="lowercase"/>
+        <x-html.a link="{{url(route('change:personal-identification'))}}" text="Редактировать" class="lowercase"/>
     </div>
 
 

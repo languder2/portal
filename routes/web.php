@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Notification;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\AdminServiceController;
@@ -83,8 +84,9 @@ Route::middleware("auth.check")
         Route::get('personal',function(){
             return view('pages.public.account',[
                 'contents'      => [
-                    view('sections.public.notifications',[
-
+                    "notifications"     => view("sections.public.notifications",
+                        [
+                            "list"          => Notification::getList(auth()->user()->getAuthIdentifier()),
                     ])->render(),
                     view('account.public.panel.personal-base',[
                         'user'      => auth()->user(),
@@ -101,12 +103,32 @@ Route::middleware("auth.check")
             ]);
         })->name('show:personal');
 
-        Route::view('personal/change','pages.public.account',[
-            "form"          => view("account.public.forms.personal",[]),
-            "headTitle"     => 'Портал ФГБОУ ВО "МелГУ": Персональные данные'
-        ])->name('change:personal');
+        Route::get('change/personal-base',function(){
+            return view('pages.public.account',[
+                'contents'      => [
+                    view('account.public.forms.personal-base',[
+                        'user'      => auth()->user(),
+                        'detail'    => UserDetail::find(auth()->user()->getAuthIdentifier())
+                    ])->render(),
+                ],
+                "headTitle"     => 'Портал ФГБОУ ВО "МелГУ": Персональные данные'
+            ]);
+        })->name('change:personal-base');
 
+        Route::get('change/personal-identification',function(){
+            return view('pages.public.account',[
+                'contents'      => [
+                    view('account.public.forms.personal-identification',[
+                        'detail'    => UserDetail::find(auth()->user()->getAuthIdentifier())
+                    ])->render(),
+                ],
+                "headTitle"     => 'Портал ФГБОУ ВО "МелГУ": Персональные данные'
+            ]);
+        })->name('change:personal-identification');
 
+        //pattern="[0-9]{3}-[0-9]{2}-[0-9]{4}"
+
+        Route::post('save/personal-base','savePersonalBase')->name("save:personal-base");
 });
 
 Route::controller(TestController::class)->prefix("test")->group(function () {

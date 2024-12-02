@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class html.a extends Component
+class popovers.base extends Component
 {
     /**
      * Create a new component instance.
@@ -21,6 +21,6 @@ class html.a extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.html.a');
+        return view('components.popovers.base');
     }
 }

@@ -18,13 +18,13 @@
                     <x-html.a-white link="{{url(route('show:personal'))}}" text="Персональные данные"/>
                 </li>
                 <li>
-                    <x-html.a-white link="{{url(route('change:personal'))}}" text="Учебные данные"/>
+                    <x-html.a-white link="{{url(route('show:personal'))}}" text="Учебные данные"/>
                 </li>
                 <li>
-                    <x-html.a-white link="{{url(route('change:personal'))}}" text="Рабочие данные"/>
+                    <x-html.a-white link="{{url(route('show:personal'))}}" text="Рабочие данные"/>
                 </li>
                 <li>
-                    <x-html.a-white link="{{url(route('change:personal'))}}" text="Военный учет"/>
+                    <x-html.a-white link="{{url(route('show:personal'))}}" text="Военный учет"/>
                 </li>
             </ul>
         @else

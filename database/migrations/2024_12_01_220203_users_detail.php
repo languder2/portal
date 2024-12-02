@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('uid');
             $table->string('snils')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('document_type')->nullable();
             $table->string('document_serial')->nullable();
             $table->string('document_number')->nullable();
             $table->string('document_issue_date')->nullable();

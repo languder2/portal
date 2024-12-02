@@ -1,4 +1,7 @@
-<section class="bg-white p-4 rounded-md mb-4 lg:max-w-[700px] lg:mx-auto">
+<section class="
+        bg-white p-4 rounded-md mb-4
+        lg:max-w-content lg:mx-auto
+">
     <x-html.h3 text="Прописка и адрес проживания"/>
 
     <div class="grid lg:grid-cols-5 gap-0 lg:gap-4">
