@@ -15,7 +15,7 @@
     @endif
 
     <form
-{{--        action          = "{{url(route('save:personal-identification'))}}"--}}
+        action          = "{{url(route('save:personal-identification'))}}"
         method          = "POST"
         id              = "changePersonalIdentification"
         name            = "changePersonalIdentification"
@@ -26,20 +26,29 @@
             id="snils"
             type="text"
             name="snils"
-            label="СНИЛС"
+            label="СНИЛС (000-000-000 00)"
             value="{{old('snils')??@$detail->snils}}"
             autocomplete="off"
             pattern="[0-9]{3}-[0-9]{3}-[0-9]{3} [0-9]{2}"
-            :datas="[
-                'popover-target'    => 'popover-snils'
+            :popover="[
+                'title' => 'Поле ввода СНИЛСа',
+                'text'  => 'формат: <b>000-000-000 00</b>',
             ]"
             required
         />
 
-        <x-popovers.base
-            id="popover-snils"
-            title="Поле ввода СНИЛСа"
-            text="Поле обязательно к заполнению и должно быть заполнено в формате <b>000-000-000 00</b>"
+        <x-form.input-bb-box
+            id="inn"
+            type="text"
+            name="inn"
+            label="Идентификационный код"
+            value="{{old('inn')??@$detail->inn}}"
+            pattern="[0-9]{12}"
+            autocomplete="off"
+            :popover="[
+                'title' => 'Поле ввода ИНН',
+                'text'  => 'Номер должен состоять из 12 цифр',
+            ]"
         />
 
         <x-form.input-bb-box
@@ -102,7 +111,12 @@
             name="document_issue_whom_code"
             label="Код подразделения выдавшего документа"
             value="{{old('document_issue_whom_code')??@$detail->document_issue_whom_code}}"
+            pattern="[0-9]{3}-[0-9]{3}"
             autocomplete="off"
+            :popover="[
+                'title' => 'Код подразделения',
+                'text'  => 'формат: <b>000-000</b>',
+            ]"
         />
 
         <div class="text-right">

@@ -6,14 +6,13 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class popovers.base extends Component
+class news extends Component
 {
     /**
      * Create a new component instance.
      */
-    public function __construct()
+    public function __construct(public $news)
     {
-        //
     }
 
     /**
@@ -21,6 +20,6 @@ class popovers.base extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.popovers.base');
+        return view('components.news');
     }
 }

@@ -2,7 +2,7 @@
      id="{{$id}}"
      role="tooltip"
      class="
-        absolute z-10 invisible inline-block w-64
+        absolute z-10 invisible inline-block max-w-76
         text-sm text-gray-500
         transition-opacity duration-300
         bg-white

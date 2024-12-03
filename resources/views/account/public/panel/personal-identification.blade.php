@@ -13,11 +13,10 @@
         </div>
 
         <div class="lg:col-span-2 font-bold">
-            Паспорт:
+            ИНН:
         </div>
         <div class="lg:col-span-3">
-            {{@$detail->document_serial}}
-            {{@$detail->document_number}}
+            {{@$detail->inn}}
         </div>
 
         <div class="lg:col-span-2 font-bold">
@@ -28,10 +27,36 @@
         </div>
 
         <div class="lg:col-span-2 font-bold">
-            ИНН:
+            Документ:
         </div>
         <div class="lg:col-span-3">
-            {{@$detail->inn}}
+            {{@$detail->document_type}}
+            {{@$detail->document_serial}}
+            {{@$detail->document_number}}
+        </div>
+
+        <div class="lg:col-span-2 font-bold">
+            Дата выдачи:
+        </div>
+        <div class="lg:col-span-3">
+            @if($detail->document_issue_date)
+                {{Carbon\Carbon::createFromDate($detail->document_issue_date)->format('d.m.Y')}}
+            @endif
+
+        </div>
+
+        <div class="lg:col-span-2 font-bold">
+            Код подразделения:
+        </div>
+        <div class="lg:col-span-3">
+            {{@$detail->document_issue_whom_code}}
+        </div>
+
+        <div class="lg:col-span-2 font-bold">
+            Кем выдан:
+        </div>
+        <div class="lg:col-span-3">
+            {{@$detail->document_issue_whom}}
         </div>
     </div>
 
@@ -39,7 +64,4 @@
     <div class="text-right">
         <x-html.a link="{{url(route('change:personal-identification'))}}" text="Редактировать" class="lowercase"/>
     </div>
-
-
-
 </section>

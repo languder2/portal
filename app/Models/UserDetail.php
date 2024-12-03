@@ -11,6 +11,8 @@ class UserDetail extends Model
     protected $fillable = [
         'uid',
         'snils',
+        'citizenship',
+        'document_type',
         'document_serial',
         'document_number',
         'document_issue_date',

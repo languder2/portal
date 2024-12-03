@@ -7,9 +7,27 @@ use App\Models\{Notification, Token, User, Role, UserDetail};
 use Illuminate\Http\{JsonResponse,RedirectResponse,Request};
 use Illuminate\Support\{Carbon,Str,Facades\Session};
 use Illuminate\View\View;
+use function App\View\Components\render;
 
 class AccountController extends Controller
 {
+    protected User $user;
+    protected UserDetail $detail;
+
+    public function __construct()
+    {
+        if(auth()->check()){
+            $this->user = User::find(auth()->user()->getAuthIdentifier());
+
+            $this->detail     = UserDetail::where('uid',$this->user->id)->first();
+
+            if($this->detail === null)
+                $this->detail         = UserDetail::create([
+                    'uid'               => $this->user->id,
+                ]);
+        }
+    }
+
     public function auth(Request $request): JsonResponse|string|RedirectResponse
     {
 
@@ -320,19 +338,11 @@ class AccountController extends Controller
 
     public function savePersonalBase(Request $request):RedirectResponse
     {
-        $user       = User::find(auth()->user()->getAuthIdentifier());
-        $detail     = UserDetail::where('uid',$user->id)->first();
-
-        if($detail === null)
-            $detail         = UserDetail::create([
-                'uid'               => $user->id,
-            ]);
-
         $userForm = $request->validate([
             "lastname"              => "required",
             "firstname"             => "required",
             "middlename"            => "",
-            "email"                 => "required|unique:users,email,$user->id|regex:'^[a-zA-Z0-9_.+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,6}$'",
+            "email"                 => "required|unique:users,email,{$this->user->id}|regex:'^[a-zA-Z0-9_.+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,6}$'",
         ]);
 
         $detailForm = $request->validate([
@@ -341,27 +351,63 @@ class AccountController extends Controller
             'birthday'              => ""
         ]);
 
-        if($user->email !== $userForm['email'])
-            $emailChanged = true;
+        if($this->user->email !== $userForm['email']){
+            $this->user->update([
+                'email'             => $userForm['email']
+            ]);
 
-        $user->update($userForm);
+            User::sendEmailVerification($this->user,null,'change:email');
+        }
 
-        $detail->update($detailForm);
+        $this->user->update($userForm);
+
+        $this->detail->update($detailForm);
 
         Notification::updateOrCreate(
             [
                 'code'      => 'save:personal-base',
-                'uid'       => $user->id,
+                'uid'       => $this->user->id,
             ],
             [
                 'code'      => 'save:personal-base',
                 'type'      => 'success',
-                'uid'       => $user->id,
+                'uid'       => $this->user->id,
                 'message'   => 'Персональные данные сохранены',
             ]
         );
 
         return redirect()->route('show:personal');
     }
+    public function savePersonalIdentification(Request $request):RedirectResponse
+    {
+        $detailForm = $request->validate([
+            'snils'                     => "regex:'^[0-9]{3}\-[0-9]{3}\-[0-9]{3} [0-9]{2}'",
+            'inn'                       => "",
+            'citizenship'               => "",
+            'document_type'             => "",
+            'document_serial'           => "",
+            'document_number'           => "",
+            'document_issue_date'       => "",
+            'document_issue_whom'       => "",
+            'document_issue_whom_code'  => "regex:'^[0-9]{3}\-[0-9]{3}'|nullable",
+        ]);
 
+
+        $this->detail->update($detailForm);
+
+        Notification::updateOrCreate(
+            [
+                'code'      => 'save:personal-identification',
+                'uid'       => $this->user->id,
+            ],
+            [
+                'code'      => 'save:personal-base',
+                'type'      => 'success',
+                'uid'       => $this->user->id,
+                'message'   => 'Паспортные данные сохранены',
+            ]
+        );
+
+        return redirect()->route('show:personal');
+    }
 }

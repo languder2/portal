@@ -1,12 +1,11 @@
 <?php
 
-use App\Models\Notification;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\AdminServiceController;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\AccountController;
-use App\Models\UserDetail;
+use App\Models\{Notification,UserDetail,Role};
 
 Route::get('/', function () {
 
@@ -76,7 +75,21 @@ Route::middleware("auth.check")
     ->controller(AccountController::class)
     ->prefix("account")
     ->group(function (){
-        Route::get("","page")->name("account");
+        Route::get('',function(){
+            return view('pages.public.account',[
+                'contents'      => [
+                    "notifications"     => view("sections.public.notifications",
+                        [
+                            "list"          => Notification::getList(auth()->user()->getAuthIdentifier()),
+                        ])->render(),
+                    view('account.public.panel.roles',[
+                        'user'      => auth()->user(),
+                        'roles'     => Role::where('uid',auth()->user()->getAuthIdentifier())->get(),
+                    ])->render(),
+                ],
+                "headTitle"     => 'Портал ФГБОУ ВО "МелГУ": Аккаунт'
+            ]);
+        })->name('account');
 
         Route::get("resend-email-verification","resendEmailVerification")
             ->name("resend-email-verification");
@@ -95,9 +108,9 @@ Route::middleware("auth.check")
                     view('account.public.panel.personal-identification',[
                         'detail'    => UserDetail::find(auth()->user()->getAuthIdentifier())
                     ])->render(),
-                    view('account.public.panel.personal-address',[
-                        'detail'    => UserDetail::find(auth()->user()->getAuthIdentifier())
-                    ])->render(),
+//                    view('account.public.panel.personal-address',[
+//                        'detail'    => UserDetail::find(auth()->user()->getAuthIdentifier())
+//                    ])->render(),
                 ],
                 "headTitle"     => 'Портал ФГБОУ ВО "МелГУ": Персональные данные'
             ]);
@@ -115,6 +128,8 @@ Route::middleware("auth.check")
             ]);
         })->name('change:personal-base');
 
+        Route::post('save/personal-base','savePersonalBase')->name("save:personal-base");
+
         Route::get('change/personal-identification',function(){
             return view('pages.public.account',[
                 'contents'      => [
@@ -126,9 +141,8 @@ Route::middleware("auth.check")
             ]);
         })->name('change:personal-identification');
 
-        //pattern="[0-9]{3}-[0-9]{2}-[0-9]{4}"
-
-        Route::post('save/personal-base','savePersonalBase')->name("save:personal-base");
+        Route::post('save/personal-identification','savePersonalIdentification')
+            ->name("save:personal-identification");
 });
 
 Route::controller(TestController::class)->prefix("test")->group(function () {

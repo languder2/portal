@@ -13,3 +13,16 @@
 @section('menu')
     @include("layouts.public.menu")
 @endsection
+
+@section('news')
+    @include(
+        "layouts.public.news",
+        [
+            'list'  => [
+                    1,
+                    2,
+                    3
+            ]
+        ]
+    )
+@endsection

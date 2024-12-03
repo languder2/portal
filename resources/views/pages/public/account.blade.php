@@ -26,3 +26,13 @@
 @section('menu')
     @include("layouts.public.menu")
 @endsection
+
+@section('news')
+
+    @include(
+        "layouts.public.news",
+        [
+            'list'  => \App\Models\User::orderBy('id','desc')->limit(3)->get()
+        ]
+    )
+@endsection

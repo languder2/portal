@@ -1,4 +1,10 @@
-<div class="relative input-box z-0 w-full mb-5 group">
+<div
+    class="relative input-box z-0 w-full mb-5 group"
+    @if(isset($popover))
+        data-popover-target = "popover-{{$id}}"
+    @endif
+
+>
     <input  type         = "{{$type??"text"}}"
             name         = "{{@$name}}"
             id           = "{{@$id}}"
@@ -68,3 +74,13 @@
         {{@$label}}@if(isset($required))<span class="text-red-700 font-semibold">*</span> @endif
     </label>
 </div>
+
+
+@if(isset($popover))
+    <x-popovers.base
+        id="popover-{{$id}}"
+        title="{!! $popover['title'] !!}"
+        text="{!! $popover['text'] !!}"
+        class="{!! @$popover['class'] !!}"
+    />
+@endif

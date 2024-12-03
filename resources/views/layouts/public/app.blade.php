@@ -11,9 +11,31 @@
 
 @yield('menu')
 
-<main class="mt-4 mx-4 md:ml-19rem">
-    @yield('content')
+<main
+    class   = "
+        mt-4 mx-4
+        md:ml-19rem
+        flex flex-col
+        2xl:gap-4 2xl:flex-row
+">
+    <section class="content border-red-600 flex-1 lg:w-auto">
+        @yield('content')
+    </section>
+    <section
+        id="sidebar-right"
+        class="
+            flex-none
+            w-full
+            2xl:w-[20rem]
+            3xl:w-[30rem]
+            4xl:w-[40rem]
+    ">
+        @yield('news')
+    </section>
 </main>
+
+
+
 
 </body>
 </html>

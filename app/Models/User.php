@@ -57,7 +57,6 @@ class User extends Authenticatable
 
     public static function createPassword($length = 12):string
     {
-
         $symbolsTypes       =[
             "lowercase","uppercase","numbers"
         ];
@@ -86,11 +85,19 @@ class User extends Authenticatable
         return $string[rand(0,strlen($string)-1)];
     }
 
-    public static function sendEmailVerification(User $user,?string $pass):bool
+    public static function sendEmailVerification(
+        User $user,
+        ?string $pass =  null,
+        ?string $type = 'registration'
+    ):bool
     {
         do
             $token = Str::random(32);
         while(Token::where('token',$token)->exists());
+
+        $user->update([
+            'email_verified_at'     => null
+        ]);
 
         Token::updateOrCreate(
             [
@@ -103,14 +110,22 @@ class User extends Authenticatable
             ]
         );
 
-        SendEmailJob::dispatch((object)[
-            "template"          => "emails.account.registration",
-            "subject"           => "Регистрация на портале ФГБОУ ВО \"МелГУ\"",
-            "user"              => $user,
-            "pass"              => &$pass,
-            "token"             => $token,
-            "date"              => Carbon::now( 'Europe/Moscow')->addHours(24)->format('d.m.Y H:i:s'),
-        ]);
+        $tempalte = match ($type) {
+            'registration'  => 'emails.account.registration',
+            'change:email'  => 'emails.account.change-email',
+            default         => null,
+        };
+
+        if(!is_null($tempalte))
+            SendEmailJob::dispatch((object)[
+                "template"          => $tempalte,
+                "subject"           => "Регистрация на портале ФГБОУ ВО \"МелГУ\"",
+                "user"              => $user,
+                "pass"              => &$pass,
+                "token"             => $token,
+                "date"              => Carbon::now( 'Europe/Moscow')
+                                            ->addHours(24)->format('d.m.Y H:i:s'),
+            ]);
 
         Notification::updateOrCreate(
             [

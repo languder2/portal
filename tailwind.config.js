@@ -29,6 +29,10 @@ export default {
                 baseRed     : '#820000',
                 test        : '#777700',
             },
+            screens: {
+                '3xl'       : '2000px',
+                '4xl'       : '2300px'
+            }
         },
     },
     plugins: [
