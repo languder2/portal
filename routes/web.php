@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminServiceController;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\AccountController;
 use App\Models\{Notification,UserDetail,Role};
+use App\Models\{Faculty,Department};
 
 Route::get('/', function () {
 
@@ -143,7 +144,53 @@ Route::middleware("auth.check")
 
         Route::post('save/personal-identification','savePersonalIdentification')
             ->name("save:personal-identification");
-});
+
+        Route::get('educations',function(){
+            return view('pages.public.account',[
+                'contents'      => [
+                    "notifications"     => view("sections.public.notifications",
+                        [
+                            "list"          => Notification::getList(auth()->user()->getAuthIdentifier()),
+                        ])->render(),
+                    view('account.public.forms.snils',[
+                        'uDetail'           => UserDetail::find(auth()->user()->getAuthIdentifier())
+                    ])->render(),
+                    view('account.public.panel.education-list',[
+                        'list'               => UserDetail::find(auth()->user()->getAuthIdentifier())
+                    ])->render(),
+//                    view('account.public.panel.personal-address',[
+//                        'detail'    => UserDetail::find(auth()->user()->getAuthIdentifier())
+//                    ])->render(),
+                ],
+                "headTitle"     => 'Портал ФГБОУ ВО "МелГУ": Персональные данные'
+            ]);
+        })->name('show:education');
+
+        Route::get('educations/add',function(){
+            return view('pages.public.account',[
+                'contents'      => [
+                    "notifications"     => view("sections.public.notifications",
+                        [
+                            "list"          => Notification::getList(auth()->user()->getAuthIdentifier()),
+                        ])->render(),
+                    view('account.public.forms.education',[
+                        'faculties'         => Faculty::getListForComponent(),
+                        'departments'       => Department::getListForComponent(),
+                        'uDetail'           => UserDetail::find(auth()->user()->getAuthIdentifier())
+                    ])->render(),
+//                    view('account.public.panel.personal-address',[
+//                        'detail'    => UserDetail::find(auth()->user()->getAuthIdentifier())
+//                    ])->render(),
+                ],
+                "headTitle"     => 'Портал ФГБОУ ВО "МелГУ": Персональные данные'
+            ]);
+        })->name('add:education');
+
+        Route::post('educations/save','saveEducation')
+            ->name("save:education");
+
+
+    });
 
 Route::controller(TestController::class)->prefix("test")->group(function () {
     Route::get('',                  "test");

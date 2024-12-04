@@ -1,4 +1,10 @@
-<section class="bg-white p-4 rounded-md">
+<section
+    class="
+        bg-white p-4 rounded-md
+        mb-4
+        lg:max-w-content lg:mx-auto
+    "
+>
     <form
         action          = "{{url(route("pass-recovery-create-token"))}}"
         method          = "POST"

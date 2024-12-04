@@ -9,30 +9,38 @@
         @if(isset($class)){{$class}}@endif
     "
 >
-    <div class="4xl:w-[20rem] w-full h-[15rem] block rounded-md absolute z-0"
+    <div
+        class="
+            w-full
+            xl:w-[20rem]
+            2xl:w-full
+            4xl:w-[20rem]
 
-         style="
+            h-[15rem] block rounded-md absolute z-0
+        "
+
+        style="
             background: url({!! $news->preview !!}) no-repeat center;
             background-size: cover;
-         "
+        "
     >
     </div>
 
     <div class="
             leading-5
             absolute z-10
-{{--            bg-green-800--}}
+            bg-white
+{{--            sm:bg-green-700--}}
 {{--            md:bg-green-400--}}
-{{--            lg:bg-orange-400--}}
-{{--            xl:bg-red-300--}}
-{{--            2xl:bg-red-400--}}
-{{--            3xl:bg-red-500--}}
-{{--            4xl:bg-red-700--}}
+{{--            lg:bg-yellow-400--}}
+{{--            xl:bg-orange-400--}}
 
             px-4 py-2
             bottom-0 right-0
 
-            md:rounded-r-md
+            rounded-b-md
+            xl:rounded-bl-none
+            xl:rounded-tr-md
             2xl:rounded-b-md
             2xl:rounded-tr-none
             4xl:rounded-b-md

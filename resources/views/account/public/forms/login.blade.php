@@ -1,7 +1,7 @@
 <section class="
         bg-white p-4 rounded-md
         mb-4
-        lg:max-w-content lg:mx-auto
+lg:max-w-content lg:mx-auto
 ">
     <form
         action          = "{{url(route("auth"))}}"
@@ -9,6 +9,7 @@
         id              = "formLogin"
         name            = "formLogin"
         class           = "max-w-screen-sm mx-auto"
+
         autocomplete    = "on"
     >
         @csrf

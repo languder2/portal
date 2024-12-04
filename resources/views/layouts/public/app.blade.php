@@ -30,7 +30,7 @@
             3xl:w-[30rem]
             4xl:w-[40rem]
     ">
-        @yield('news')
+            @yield('news')
     </section>
 </main>
 

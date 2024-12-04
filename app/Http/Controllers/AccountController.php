@@ -410,4 +410,9 @@ class AccountController extends Controller
 
         return redirect()->route('show:personal');
     }
+
+    public function saveEducation()
+    {
+
+    }
 }

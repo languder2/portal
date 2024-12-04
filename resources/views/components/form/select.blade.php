@@ -18,15 +18,31 @@
             mb-4
             {{@$class}}
         "
-        @disabled(@$disabled)
-        @required(@$required)
 
-        @if(!empty($datas) && is_array($datas))
-            @foreach($datas as $code=>$data)
-                data-{{$code}}="{{$data}}"
-            @endforeach
-       @endif
+
+    @disabled(@$disabled)
+    @required(@$required)
+
+    @if(!empty($datas) && is_array($datas))
+        @foreach($datas as $code=>$data)
+            data-{{$code}}="{{$data}}"
+        @endforeach
+    @endif
+
+    @if(isset($depended))
+        data-depended='{!!$depended!!}'
+    @endif
 >
+
+    @if(isset($null))
+        <option
+            value="null"
+            disabled
+            @selected(empty($old) && empty($value))
+        >
+            {{$null}}
+        </option>
+    @endif
     @foreach($list as $code=>$item)
         <option
             value="{{$code}}"
@@ -35,8 +51,8 @@
             @selected(empty($old) && !empty($value) && $value === $code)
             @selected(!empty($old) && $old === $code)
 
-            @if(!empty($code) && isset($optionDatas[$code]) && is_array($optionDatas[$code]))
-                @foreach($optionDatas[$code] as $dc=>$data)
+            @if(!empty($code) && isset($optionData[$code]) && is_array($optionData[$code]))
+                @foreach($optionData[$code] as $dc=>$data)
                     data-{{$dc}}="{{$data}}"
                 @endforeach
             @endif

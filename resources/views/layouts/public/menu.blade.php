@@ -12,13 +12,10 @@
                     <x-html.a-white link="{{url(route('account'))}}" text="Личный кабинет"/>
                 </li>
                 <li>
-                    <x-html.a-white link="{{url(route('change-password'))}}" text="Смена пароля"/>
-                </li>
-                <li>
                     <x-html.a-white link="{{url(route('show:personal'))}}" text="Персональные данные"/>
                 </li>
                 <li>
-                    <x-html.a-white link="{{url(route('show:personal'))}}" text="Учебные данные"/>
+                    <x-html.a-white link="{{url(route('show:education'))}}" text="Учебные данные"/>
                 </li>
                 <li>
                     <x-html.a-white link="{{url(route('show:personal'))}}" text="Рабочие данные"/>
@@ -26,6 +23,10 @@
                 <li>
                     <x-html.a-white link="{{url(route('show:personal'))}}" text="Военный учет"/>
                 </li>
+                <li>
+                    <x-html.a-white link="{{url(route('change-password'))}}" text="Смена пароля"/>
+                </li>
+
             </ul>
         @else
             <ul class="ml-4 mt-6">
