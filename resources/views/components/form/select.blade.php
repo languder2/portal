@@ -29,8 +29,8 @@
         @endforeach
     @endif
 
-    @if(isset($depended))
-        data-depended='{!!$depended!!}'
+    @if(isset($dependents) and is_array($dependents))
+        data-dependents='{!! json_encode($dependents) !!}'
     @endif
 >
 
@@ -40,7 +40,7 @@
             disabled
             @selected(empty($old) && empty($value))
         >
-            {{$null}}
+            {{$null}}@if(isset($required))* @endif
         </option>
     @endif
     @foreach($list as $code=>$item)

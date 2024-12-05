@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Session;
 use App\Models\User;
 use Illuminate\View\View;
+use App\Models\Education\{Faculty,Department};
 
 class TestController extends Controller
 {

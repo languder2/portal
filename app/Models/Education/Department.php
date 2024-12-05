@@ -2,15 +2,18 @@
 
 namespace App\Models\Education;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\{Model, Collection};
 
-class Department extends Model
+class Department extends Base
 {
     protected $table = 'ed_departments';
-    public $timestamps = true;
+
     protected $fillable = [
+        'id',
         'name',
         'faculty',
         'sort',
+        'created_at',
+        'updated_at',
     ];
 }

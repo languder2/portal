@@ -6,7 +6,7 @@ use App\Http\Controllers\AdminServiceController;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\AccountController;
 use App\Models\{Notification,UserDetail,Role};
-use App\Models\{Faculty,Department};
+use App\Models\Education\{Faculty,Department,Form,Level,Speciality};
 
 Route::get('/', function () {
 
@@ -174,8 +174,11 @@ Route::middleware("auth.check")
                             "list"          => Notification::getList(auth()->user()->getAuthIdentifier()),
                         ])->render(),
                     view('account.public.forms.education',[
-                        'faculties'         => Faculty::getListForComponent(),
-                        'departments'       => Department::getListForComponent(),
+                        'faculties'         => Faculty::getListForSelect(),
+                        'departments'       => Department::getListForSelect(['faculty']),
+                        'levels'            => Level::getListForSelect(),
+                        'forms'             => Form::getListForSelect(),
+                        'specialities'      => Speciality::getListForSelect(['faculty','level'],['code',' ','name']),
                         'uDetail'           => UserDetail::find(auth()->user()->getAuthIdentifier())
                     ])->render(),
 //                    view('account.public.panel.personal-address',[
