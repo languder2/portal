@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Jobs\SendEmailJob;
 use App\Models\{Notification, Token, User, Role, UserDetail};
+use App\Models\Education\{Faculty,Department,Level,Form,Speciality,Student};
+
 use Illuminate\Http\{JsonResponse,RedirectResponse,Request};
 use Illuminate\Support\{Carbon,Str,Facades\Session};
 use Illuminate\View\View;
-use function App\View\Components\render;
 
 class AccountController extends Controller
 {
@@ -34,7 +35,7 @@ class AccountController extends Controller
         $validation = $request->validate(
             [
                 "form.email"                => "required|email",
-                "form.password"             => "required",
+                "form.password"             => 'required',
                 "form.remember"             => "",
             ],
             [
@@ -285,8 +286,8 @@ class AccountController extends Controller
         $rules          = [
             "password"              => "required|confirmed:confirm|regex:'^(?=.*[!@#$%&*()_+\-=])(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$'",
             "email"                 => "required|unique:users,email|regex:'^[a-zA-Z0-9_.+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,6}$'",
-            "lastname"              => "required",
-            "firstname"             => "required",
+            "lastname"              => 'required',
+            "firstname"             => 'required',
             "middlename"            => "",
         ];
 
@@ -339,8 +340,8 @@ class AccountController extends Controller
     public function savePersonalBase(Request $request):RedirectResponse
     {
         $userForm = $request->validate([
-            "lastname"              => "required",
-            "firstname"             => "required",
+            "lastname"              => 'required',
+            "firstname"             => 'required',
             "middlename"            => "",
             "email"                 => "required|unique:users,email,{$this->user->id}|regex:'^[a-zA-Z0-9_.+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,6}$'",
         ]);
@@ -411,8 +412,53 @@ class AccountController extends Controller
         return redirect()->route('show:personal');
     }
 
-    public function saveEducation()
+    public function saveEducation(Request $request):RedirectResponse|string
     {
+        $rules          = [
+            'faculty'               => 'required',
+            'department'            => 'required',
+            'level'                 => 'required',
+            'form'                  => 'required',
+            'speciality'            => 'required',
+            'course'                => 'required',
+            'group_number'          => 'required',
+            'contract_number'       => '',
+            'year_from'             => '',
+            'year_to'               => '',
+        ];
 
+        $messages       = [
+            'faculty'               => 'Укажите факультет',
+            'department'            => 'Укажите кафедру',
+            'level'                 => 'Укажите уровень',
+            'form'                  => 'Укажите форму обучения',
+            'speciality'            => 'Укажите специальность',
+            'course'                => 'Укажите курс',
+            'group_number'          => 'Укажите номер группы',
+        ];
+
+
+        $form = $request->validate($rules,$messages);
+
+        $student = Student::create([
+            'uid'       => $this->user->id,
+        ]);
+
+        $student->update($form);
+
+        Notification::updateOrCreate(
+            [
+                'code'      => 'save:education',
+                'uid'       => $this->user->id,
+            ],
+            [
+                'code'      => 'save:education',
+                'type'      => 'success',
+                'uid'       => $this->user->id,
+                'message'   => 'Учебные данные сохранены',
+            ]
+        );
+
+        return redirect()->route('show:education');
     }
 }

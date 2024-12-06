@@ -81,6 +81,22 @@
             required
         />
 
+        <x-form.select
+            id="course"
+            name="course"
+            null="Выберите курс"
+            :list="[
+                1   => 1,
+                2   => 2,
+                3   => 3,
+                4   => 4,
+                5   => 5,
+            ]"
+            :old="old('course')"
+            :value="@$education->course"
+            required
+        />
+
         <x-form.input-bb-box
             type="text"
             name="group_number"
@@ -95,31 +111,36 @@
             name="contract_number"
             id="contract_number"
             label="Номер договора"
-            value="{{old('date_from')??@$education->contract_number}}"
+            value="{{old('contract_number')??@$education->contract_number}}"
             :popover="[
                 'title' => 'Поле номера договора',
                 'text'  => 'Не обязательное поле, для студентов контрактного обучения',
             ]"
-
         />
 
         <x-form.input-bb-box
             type="year"
-            name="date_from"
-            id="date_from"
+            name="year_from"
+            id="year_from"
+            pattern="^[2]\d{3}$"
             label="Год начала обучения"
-            value="{{old('date_from')??@$education->date_from}}"
+            value="{{old('year_from')??@$education->year_from}}"
         />
 
         <x-form.input-bb-box
             type="year"
-            name="date_to"
-            id="date_to"
+            name="year_to"
+            id="year_to"
+            pattern="^[2]\d{3}$"
             label="Год окончания обучения"
-            value="{{old('date_to')??@$education->date_to}}"
+            value="{{old('year_to')??@$education->year_to}}"
         />
 
-
+        <div class="text-right">
+            <x-form.button
+                value="Сохранить"
+            />
+        </div>
     </form>
 
 </section>

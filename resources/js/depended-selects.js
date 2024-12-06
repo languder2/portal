@@ -32,7 +32,7 @@ function changeAffectedSelect(id){
         let where = '';
 
         ids.forEach(id=>{
-            if(document.getElementById(id).value !== 'null')
+            if(document.getElementById(id).value !== '')
                 where += '[data-'+id+'="'+document.getElementById(id).value+'"]';
         });
 
@@ -50,8 +50,9 @@ function changeAffectedSelect(id){
             option.classList.remove('hidden');
         });
 
-        select.value = null;
+        select.value = '';
 
+        select.classList
         return  false;
     })
     return false;

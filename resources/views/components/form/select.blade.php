@@ -36,7 +36,7 @@
 
     @if(isset($null))
         <option
-            value="null"
+            value=''
             disabled
             @selected(empty($old) && empty($value))
         >
