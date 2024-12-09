@@ -8,7 +8,7 @@
 
         @if(auth()->check())
             <ul class="ml-4 mt-6">
-                <li>
+                <li class="hover:bg-white hover:-mr-4 duration-500 hover:ps-4">
                     <x-html.a-white link="{{url(route('account'))}}" text="Личный кабинет"/>
                 </li>
                 <li>
@@ -34,7 +34,7 @@
                     <x-html.a-white link="{{url(route('home'))}}" text="Авторизация"/>
 
                 </li>
-                <li>
+                <li class="hover:bg-white">
                     <x-html.a-white link="{{url(route('registration'))}}" text="Регистрация"/>
                 </li>
                 <li>

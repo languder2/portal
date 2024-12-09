@@ -104,13 +104,13 @@ Route::middleware("auth.check")
                     ])->render(),
                     view('account.public.panel.personal-base',[
                         'user'      => auth()->user(),
-                        'detail'    => UserDetail::find(auth()->user()->getAuthIdentifier())
+                        'detail'    => UserDetail::where('uid',auth()->user()->getAuthIdentifier())->first()
                     ])->render(),
                     view('account.public.panel.personal-identification',[
-                        'detail'    => UserDetail::find(auth()->user()->getAuthIdentifier())
+                        'detail'    => UserDetail::where('uid',auth()->user()->getAuthIdentifier())->first()
                     ])->render(),
 //                    view('account.public.panel.personal-address',[
-//                        'detail'    => UserDetail::find(auth()->user()->getAuthIdentifier())
+//                        'detail'    => UserDetail::where('uid',auth()->user()->getAuthIdentifier())->first()
 //                    ])->render(),
                 ],
                 "headTitle"     => 'Портал ФГБОУ ВО "МелГУ": Персональные данные'
@@ -122,7 +122,7 @@ Route::middleware("auth.check")
                 'contents'      => [
                     view('account.public.forms.personal-base',[
                         'user'      => auth()->user(),
-                        'detail'    => UserDetail::find(auth()->user()->getAuthIdentifier())
+                        'detail'    => UserDetail::where('uid',auth()->user()->getAuthIdentifier())->first()
                     ])->render(),
                 ],
                 "headTitle"     => 'Портал ФГБОУ ВО "МелГУ": Персональные данные'
@@ -135,7 +135,7 @@ Route::middleware("auth.check")
             return view('pages.public.account',[
                 'contents'      => [
                     view('account.public.forms.personal-identification',[
-                        'detail'    => UserDetail::find(auth()->user()->getAuthIdentifier())
+                        'detail'    => UserDetail::where('uid',auth()->user()->getAuthIdentifier())->first()
                     ])->render(),
                 ],
                 "headTitle"     => 'Портал ФГБОУ ВО "МелГУ": Персональные данные'
@@ -153,19 +153,13 @@ Route::middleware("auth.check")
                             "list"          => Notification::getList(auth()->user()->getAuthIdentifier()),
                         ])->render(),
                     view('account.public.forms.snils',[
-                        'uDetail'           => UserDetail::find(auth()->user()->getAuthIdentifier())
+                        'uDetail'           => UserDetail::where('uid',auth()->user()->getAuthIdentifier())->first()
                     ])->render(),
                     view('account.public.panel.education-list',[
-                        'list'               => Student::where('uid',auth()->user()->getAuthIdentifier())
-                                                    ->orderBy('year_from','desc')
-                                                    ->orderBy('id','desc')
-                                                    ->get()
+                        'list'               => Student::getList(),
                     ])->render(),
-//                    view('account.public.panel.personal-address',[
-//                        'detail'    => UserDetail::find(auth()->user()->getAuthIdentifier())
-//                    ])->render(),
                 ],
-                "headTitle"     => 'Портал ФГБОУ ВО "МелГУ": Персональные данные'
+                "headTitle"     => 'Портал ФГБОУ ВО "МелГУ": Учебные данные'
             ]);
         })->name('show:education');
 
@@ -182,20 +176,48 @@ Route::middleware("auth.check")
                         'levels'            => Level::getListForSelect(),
                         'forms'             => Form::getListForSelect(),
                         'specialities'      => Speciality::getListForSelect(['faculty','level'],['code',' ','name']),
-                        'uDetail'           => UserDetail::find(auth()->user()->getAuthIdentifier())
+                        'uDetail'           => UserDetail::where('uid',auth()->user()->getAuthIdentifier())->first()
                     ])->render(),
-//                    view('account.public.panel.personal-address',[
-//                        'detail'    => UserDetail::find(auth()->user()->getAuthIdentifier())
-//                    ])->render(),
                 ],
-                "headTitle"     => 'Портал ФГБОУ ВО "МелГУ": Персональные данные'
+                "headTitle"     => 'Портал ФГБОУ ВО "МелГУ": Добавить учебные данные'
             ]);
         })->name('add:education');
+
+        Route::get('educations/edit/{id}',function($id){
+
+                    $student = Student::where([
+                        'id'            => $id,
+                        'uid'           => auth()->user()->getAuthIdentifier()
+                    ])->first();
+
+            if(is_null($student))
+                return redirect(route('show:education'));
+
+            return view('pages.public.account',[
+                'contents'      => [
+                    "notifications"     => view("sections.public.notifications",
+                        [
+                            "list"          => Notification::getList(auth()->user()->getAuthIdentifier()),
+                        ])->render(),
+                    view('account.public.forms.education',[
+                        'faculties'         => Faculty::getListForSelect(),
+                        'departments'       => Department::getListForSelect(['faculty']),
+                        'levels'            => Level::getListForSelect(),
+                        'forms'             => Form::getListForSelect(),
+                        'specialities'      => Speciality::getListForSelect(['faculty','level'],['code',' ','name']),
+                        'uDetail'           => UserDetail::where('uid',auth()->user()->getAuthIdentifier())->first(),
+                        'student'           => $student
+                    ])->render(),
+                ],
+                "headTitle"     => 'Портал ФГБОУ ВО "МелГУ": Добавить учебные данные'
+            ]);
+        })->name('edit:education');
 
         Route::post('educations/save','saveEducation')
             ->name("save:education");
 
-
+        Route::get('educations/delete/{id}','deleteEducation')
+            ->name("delete:education");
     });
 
 Route::controller(TestController::class)->prefix("test")->group(function () {

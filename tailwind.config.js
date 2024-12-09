@@ -30,6 +30,8 @@ export default {
                 test        : '#777700',
             },
             screens: {
+                'min'       : '360px',
+                'xs'        : '440px',
                 '3xl'       : '2000px',
                 '4xl'       : '2300px'
             }

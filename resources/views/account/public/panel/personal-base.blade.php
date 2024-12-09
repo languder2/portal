@@ -32,7 +32,7 @@
             Дата рождения:
         </div>
         <div class="lg:col-span-3">
-            @if($detail->birthday)
+            @if(@$detail->birthday)
                 {{Carbon\Carbon::createFromDate($detail->birthday)->format('d.m.Y')}}
             @endif
         </div>

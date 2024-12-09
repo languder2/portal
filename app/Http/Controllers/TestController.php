@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Session;
 use App\Models\User;
 use Illuminate\View\View;
 use App\Models\Education\{Faculty,Department};
-
+use App\Models\Role;
 class TestController extends Controller
 {
     public function auth():string

@@ -26,6 +26,8 @@ return new class extends Migration
             $table->year('year_to')->nullable();
             $table->timestamps();
 
+            $table->softDeletes();
+
             $table->foreign('faculty')->references('id')->on('ed_faculties')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');

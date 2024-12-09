@@ -19,15 +19,7 @@
             Или предоставьте системе сгенерировать его.
         </p>
 
-        @if(!is_null($errors) && $errors->all())
-            <div class="border-2 border-l-4 border-l-red-700 mb-6 px-3 py-2 rounded-md">
-                @foreach ($errors->all() as $message)
-                    <div>
-                        {!! $message !!}
-                    </div>
-                @endforeach
-            </div>
-        @endif
+        <x-form.errors :list="$errors->all()"/>
 
         <x-form.input-bb-box
             id="Password"

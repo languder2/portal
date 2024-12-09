@@ -10,16 +10,28 @@
         class           = "max-w-content mx-auto"
     >
         @csrf
-        <x-html.h3 text='Учебные данные студентов ФГБОУ ВО "МелГУ"'/>
 
-        @if(!is_null($errors) && $errors->all())
-            <div class="border-2 border-l-4 border-l-red-700 mb-6 px-3 py-2 rounded-md">
-                @foreach ($errors->all() as $message)
-                    <div>
-                        {!! $message !!}
-                    </div>
-                @endforeach
-            </div>
+        <x-form.input-bb-box type="hidden" name="id" value="{{@$student->id}}"/>
+
+        <x-html.h3 text='Учебные данные студента ФГБОУ ВО "МелГУ"'/>
+
+        <x-form.errors :list="$errors->all()"/>
+
+        @if(is_null(@$uDetail->snils))
+            <x-form.input-bb-box
+                id="snils"
+                type="text"
+                name="snils"
+                label="СНИЛС (000-000-000 00)"
+                value="{{old('snils')??@$detail->snils}}"
+                autocomplete="off"
+                pattern="[0-9]{3}-[0-9]{3}-[0-9]{3} [0-9]{2}"
+                :popover="[
+                'title' => 'Поле ввода СНИЛСа',
+                'text'  => 'формат: <b>000-000-000 00</b>',
+            ]"
+                required
+            />
         @endif
 
         <x-form.select
@@ -29,8 +41,7 @@
             :list="$faculties->options??[]"
             :optionData="$faculties->options??[]"
             :old="old('faculty')"
-            :value="@$education->faculty"
-            required
+            :value="@$student->faculty"
         />
 
         <x-form.select
@@ -40,7 +51,7 @@
             :list="$departments->options??[]"
             :optionData="$departments->data??[]"
             :old="old('department')"
-            :value="@$education->department"
+            :value="@$student->department"
             :dependents='$departments->dependents'
             required
         />
@@ -52,7 +63,7 @@
             :list="$levels->options??[]"
             :optionData="$levels->data??[]"
             :old="old('level')"
-            :value="@$education->level"
+            :value="@$student->level"
             :dependents='$levels->dependents'
             required
         />
@@ -64,7 +75,7 @@
             :list="$forms->options??[]"
             :optionData="$forms->data??[]"
             :old="old('form')"
-            :value="@$education->form"
+            :value="@$student->form"
             :dependents='$forms->dependents'
             required
         />
@@ -76,7 +87,7 @@
             :list="$specialities->options??[]"
             :optionData="$specialities->data??[]"
             :old="old('speciality')"
-            :value="@$education->speciality"
+            :value="@$student->speciality"
             :dependents='$specialities->dependents'
             required
         />
@@ -93,7 +104,7 @@
                 5   => 5,
             ]"
             :old="old('course')"
-            :value="@$education->course"
+            :value="@$student->course"
             required
         />
 
@@ -102,7 +113,7 @@
             name="group_number"
             id="group_number"
             label="Номер группы"
-            value="{{old('group_number')??@$education->group_number}}"
+            value="{{old('group_number')??@$student->group_number}}"
             required
         />
 
@@ -111,7 +122,7 @@
             name="contract_number"
             id="contract_number"
             label="Номер договора"
-            value="{{old('contract_number')??@$education->contract_number}}"
+            value="{{old('contract_number')??@$student->contract_number}}"
             :popover="[
                 'title' => 'Поле номера договора',
                 'text'  => 'Не обязательное поле, для студентов контрактного обучения',
@@ -124,7 +135,7 @@
             id="year_from"
             pattern="^[2]\d{3}$"
             label="Год начала обучения"
-            value="{{old('year_from')??@$education->year_from}}"
+            value="{{old('year_from')??@$student->year_from}}"
         />
 
         <x-form.input-bb-box
@@ -133,7 +144,7 @@
             id="year_to"
             pattern="^[2]\d{3}$"
             label="Год окончания обучения"
-            value="{{old('year_to')??@$education->year_to}}"
+            value="{{old('year_to')??@$student->year_to}}"
         />
 
         <div class="text-right">
@@ -144,3 +155,4 @@
     </form>
 
 </section>
+@dump(@$student)

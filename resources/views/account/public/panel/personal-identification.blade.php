@@ -39,7 +39,7 @@
             Дата выдачи:
         </div>
         <div class="lg:col-span-3">
-            @if($detail->document_issue_date)
+            @if(@$detail->document_issue_date)
                 {{Carbon\Carbon::createFromDate($detail->document_issue_date)->format('d.m.Y')}}
             @endif
 

@@ -18,13 +18,7 @@
             Не помните пароль?
         </h3>
 
-        @if(!is_null($errors) && $errors->all())
-            <div class="border-2 border-l-4 border-l-red-700 mb-6 px-3 py-2 rounded-md">
-                @foreach ($errors->all() as $message)
-                    {!! $message !!}
-                @endforeach
-            </div>
-        @endif
+        <x-form.errors :list="$errors->all()"/>
 
         <x-form.input-bb-box
             type="email"

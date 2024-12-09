@@ -12,8 +12,8 @@ use Illuminate\View\View;
 
 class AccountController extends Controller
 {
-    protected User $user;
-    protected UserDetail $detail;
+    protected ?User $user;
+    protected ?UserDetail $detail;
 
     public function __construct()
     {
@@ -100,9 +100,7 @@ class AccountController extends Controller
                         'uid'       => $user->id,
                     ],
                     [
-                        'code'      => 'password:change',
                         'type'      => 'success',
-                        'uid'       => $user->id,
                         'message'   => json_encode(['email'=>$user->email],JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT),
                         'template'  => 'notifications.account-password-created',
                     ]
@@ -148,9 +146,7 @@ class AccountController extends Controller
                 "uid"       => $user->id,
             ],
             [
-                "code"      => "password:change",
                 "type"      => "success",
-                "uid"       => $user->id,
                 "message"   => "Новый пароль задан",
                 'template'  => null,
             ]
@@ -260,7 +256,6 @@ class AccountController extends Controller
             ],
             [
                 "token"     => $token,
-                "email"     => $user->email,
                 "code"      => 'password:recovery'
             ]
         );
@@ -370,9 +365,7 @@ class AccountController extends Controller
                 'uid'       => $this->user->id,
             ],
             [
-                'code'      => 'save:personal-base',
                 'type'      => 'success',
-                'uid'       => $this->user->id,
                 'message'   => 'Персональные данные сохранены',
             ]
         );
@@ -381,8 +374,9 @@ class AccountController extends Controller
     }
     public function savePersonalIdentification(Request $request):RedirectResponse
     {
-        $detailForm = $request->validate([
-            'snils'                     => "regex:'^[0-9]{3}\-[0-9]{3}\-[0-9]{3} [0-9]{2}'",
+
+        $rules      = [
+            'snils'                     => "unique:users_details,snils,{$this->detail->id}|required|regex:'^[0-9]{3}\-[0-9]{3}\-[0-9]{3} [0-9]{2}'",
             'inn'                       => "",
             'citizenship'               => "",
             'document_type'             => "",
@@ -391,7 +385,17 @@ class AccountController extends Controller
             'document_issue_date'       => "",
             'document_issue_whom'       => "",
             'document_issue_whom_code'  => "regex:'^[0-9]{3}\-[0-9]{3}'|nullable",
-        ]);
+        ];
+
+        $messages   = [
+            'snils.unique'              => 'Указанный СНИЛС уже есть в Нашей базе',
+            'snils.required'            => 'Поле СНИЛС обязательно к заполнению',
+            'snils.regex'               => 'Поле СНИЛС должно быть заполнено в формате: <b>000-000-000 00</b>',
+            'document_issue_whom_code.reqex'
+                            => 'Код подразделения выдавшего документа быть заполнено в формате: <b>000-000</b>',
+        ];
+
+        $detailForm = $request->validate($rules,$messages);
 
 
         $this->detail->update($detailForm);
@@ -402,9 +406,7 @@ class AccountController extends Controller
                 'uid'       => $this->user->id,
             ],
             [
-                'code'      => 'save:personal-base',
                 'type'      => 'success',
-                'uid'       => $this->user->id,
                 'message'   => 'Паспортные данные сохранены',
             ]
         );
@@ -414,6 +416,34 @@ class AccountController extends Controller
 
     public function saveEducation(Request $request):RedirectResponse|string
     {
+
+        if($request->get('id')){
+
+            $student = Student::where([
+                'id'            => $request->get('id'),
+                'uid'           => auth()->user()->getAuthIdentifier()
+            ])->first();
+
+            if(is_null($student))
+                return redirect()->route('show:education');
+        }
+
+
+        if($this->detail->snils === null){
+            $rules      = [
+                'snils'             => "required|regex:'^[0-9]{3}\-[0-9]{3}\-[0-9]{3} [0-9]{2}'",
+            ];
+
+            $messages   = [
+                'snils.required'    => 'Поле СНИЛС обязательно к заполнению',
+                'snils.regex'       => 'Поле СНИЛС должно быть заполнено в формате: <b>000-000-000 00</b>',
+            ];
+
+            $form = $request->validate($rules,$messages);
+
+            $this->detail->update($form);
+        }
+
         $rules          = [
             'faculty'               => 'required',
             'department'            => 'required',
@@ -423,8 +453,8 @@ class AccountController extends Controller
             'course'                => 'required',
             'group_number'          => 'required',
             'contract_number'       => '',
-            'year_from'             => '',
-            'year_to'               => '',
+            'year_from'             => 'nullable|numeric',
+            'year_to'               => "nullable|numeric|min:{$request->year_from}",
         ];
 
         $messages       = [
@@ -435,14 +465,15 @@ class AccountController extends Controller
             'speciality'            => 'Укажите специальность',
             'course'                => 'Укажите курс',
             'group_number'          => 'Укажите номер группы',
+            'year_to.min'           => "Год окончания не может быть меньше года начала обучения",
         ];
-
 
         $form = $request->validate($rules,$messages);
 
-        $student = Student::create([
-            'uid'       => $this->user->id,
-        ]);
+        if(!isset($student))
+            $student = Student::create([
+                'uid'       => $this->user->id,
+            ]);
 
         $student->update($form);
 
@@ -452,12 +483,43 @@ class AccountController extends Controller
                 'uid'       => $this->user->id,
             ],
             [
-                'code'      => 'save:education',
                 'type'      => 'success',
-                'uid'       => $this->user->id,
                 'message'   => 'Учебные данные сохранены',
             ]
         );
+
+        Student::updatingRole($this->user->id);
+
+        return redirect()->route('show:education');
+    }
+
+    public function deleteEducation(int $id):RedirectResponse
+    {
+
+        $student = Student::where([
+            'id'            => $id,
+            'uid'           => auth()->user()->getAuthIdentifier()
+        ])->first();
+
+        if(is_null($student))
+            return redirect()->route('show:education');
+
+        $speciality         = Speciality::find($student->speciality);
+
+        Notification::updateOrCreate(
+            [
+                'code'      => 'delete:education:',
+                'uid'       => $this->user->id,
+            ],
+            [
+                'type'      => 'success',
+                'message'   => "Учебные данные удалены: {$speciality->code} {$speciality->name}",
+            ]
+        );
+
+        $student->delete();
+
+        Student::updatingRole($this->user->id);
 
         return redirect()->route('show:education');
     }
