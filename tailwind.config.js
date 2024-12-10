@@ -34,6 +34,9 @@ export default {
                 'xs'        : '440px',
                 '3xl'       : '2000px',
                 '4xl'       : '2300px'
+            },
+            backgroundImage:{
+                'bgImgItemMenuAfter' : 'url(/img/subtract.svg)',
             }
         },
     },
