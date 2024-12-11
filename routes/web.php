@@ -85,7 +85,7 @@ Route::middleware("auth.check")
                         ])->render(),
                     view('account.public.panel.roles',[
                         'user'      => auth()->user(),
-                        'roles'     => Role::where('uid',auth()->user()->getAuthIdentifier())->get(),
+                        'roles'     => Role::getUserRoles(auth()->user()->getAuthIdentifier()),
                     ])->render(),
                 ],
                 "headTitle"     => 'Портал ФГБОУ ВО "МелГУ": Аккаунт'

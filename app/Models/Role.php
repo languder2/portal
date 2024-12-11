@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 class Role extends Model
@@ -17,13 +18,13 @@ class Role extends Model
     {
         return DB::table('roles')->get();
     }
-    public static function getRoleByName(string $role):object
+    public static function getRoleByCode(string $role):object
     {
-        return DB::table('roles')->where('name',$role)->first();
+        return DB::table('roles')->where('code',$role)->first();
     }
     public static function setRole(int $uid,$role):bool
     {
-        $role   = self::getRoleByName($role);
+        $role   = self::getRoleByCode($role);
         $role   = Role::firstOrNew(
             [
                 'uid'       => $uid,
@@ -49,13 +50,22 @@ class Role extends Model
 
     public static function deleteRole(int $uid,$role):void
     {
-        $role   = self::getRoleByName($role);
+        $role   = self::getRoleByCode($role);
         $role   = Role::where(
             [
                 'uid'       => $uid,
                 'rid'       => $role->id,
             ]
         )->delete();
+    }
+
+    public static function getUserRoles(int $uid):Collection
+    {
+        return Role::where('uid',$uid)
+            ->join('roles','role_assigned.rid','=','roles.id')
+            ->select('role_assigned.*','roles.name')
+            ->get();
+
     }
 
 }
