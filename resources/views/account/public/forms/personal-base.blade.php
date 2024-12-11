@@ -66,6 +66,7 @@
             id="sex"
             name="sex"
             label="Выберите пол"
+            nullDisabled
             :list="[
                 null            => 'Выберите пол',
                 'man'           => 'Мужчина',

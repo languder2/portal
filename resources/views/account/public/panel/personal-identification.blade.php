@@ -42,7 +42,6 @@
             @if(@$detail->document_issue_date)
                 {{Carbon\Carbon::createFromDate($detail->document_issue_date)->format('d.m.Y')}}
             @endif
-
         </div>
 
         <div class="lg:col-span-2 font-bold">

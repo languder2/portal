@@ -42,6 +42,8 @@
             :optionData="$faculties->options??[]"
             :old="old('faculty')"
             :value="@$student->faculty"
+            required
+            nullDisabled
         />
 
         <x-form.select
@@ -54,6 +56,7 @@
             :value="@$student->department"
             :dependents='$departments->dependents'
             required
+            nullDisabled
         />
 
         <x-form.select
@@ -66,6 +69,7 @@
             :value="@$student->level"
             :dependents='$levels->dependents'
             required
+            nullDisabled
         />
 
         <x-form.select
@@ -78,6 +82,7 @@
             :value="@$student->form"
             :dependents='$forms->dependents'
             required
+            nullDisabled
         />
 
         <x-form.select
@@ -90,6 +95,7 @@
             :value="@$student->speciality"
             :dependents='$specialities->dependents'
             required
+            nullDisabled
         />
 
         <x-form.select
@@ -106,6 +112,7 @@
             :old="old('course')"
             :value="@$student->course"
             required
+            nullDisabled
         />
 
         <x-form.input-bb-box
@@ -153,6 +160,4 @@
             />
         </div>
     </form>
-
 </section>
-@dump(@$student)

@@ -1,7 +1,4 @@
-@include('content\public\account\education-add',[
-    'count' =>  $list->count()
-])
-
+<x-panel.public.show-education-add :list="$list"/>
 
 @foreach($list as $record)
     <x-account.education

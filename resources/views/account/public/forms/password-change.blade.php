@@ -1,6 +1,7 @@
 <section class="
             bg-white p-4 rounded-md
             lg:max-w-content lg:mx-auto
+            mb-4
 ">
     <form
         action          = "{{url(route("change-password-processing"))}}"

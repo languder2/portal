@@ -34,14 +34,21 @@ function changeAffectedSelect(id){
         ids.forEach(id=>{
             if(document.getElementById(id).value !== '')
                 where += '[data-'+id+'="'+document.getElementById(id).value+'"]';
+            else
+                return false;
         });
 
-        let options = select.querySelectorAll('option:not('+where+')');
+        let options = null;
 
-        options.forEach(option=>{
-            option.setAttribute('disabled','disabled');
-            option.classList.add('hidden');
-        });
+        if(where !== '') {
+            options = select.querySelectorAll('option:not(' + where + ')');
+
+            options.forEach(option => {
+                if (option.value === '') return;
+                option.setAttribute('disabled', 'disabled');
+                option.classList.add('hidden');
+            });
+        }
 
         options = select.querySelectorAll('option'+where);
 

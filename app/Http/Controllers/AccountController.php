@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Jobs\SendEmailJob;
 use App\Models\{Notification, Token, User, Role, UserDetail};
-use App\Models\Education\{Faculty,Department,Level,Form,Speciality,Student};
+use App\Models\Education\{Faculty,Department,Level,Form,Speciality,Student,Staff};
 
 use Illuminate\Http\{JsonResponse,RedirectResponse,Request};
 use Illuminate\Support\{Carbon,Str,Facades\Session};
@@ -428,7 +428,6 @@ class AccountController extends Controller
                 return redirect()->route('show:education');
         }
 
-
         if($this->detail->snils === null){
             $rules      = [
                 'snils'             => "required|regex:'^[0-9]{3}\-[0-9]{3}\-[0-9]{3} [0-9]{2}'",
@@ -522,5 +521,63 @@ class AccountController extends Controller
         Student::updatingRole($this->user->id);
 
         return redirect()->route('show:education');
+    }
+
+    public function saveStaff(Request $request):RedirectResponse
+    {
+        if($request->get('id')){
+
+            $staff = Staff::where([
+                'id'            => $request->get('id'),
+                'uid'           => auth()->user()->getAuthIdentifier()
+            ])->first();
+
+            if(is_null($staff))
+                return redirect()->route('show:education');
+        }
+
+        $rules          = [
+            'ed_faculty'            => '',
+            'ed_department'         => '',
+            'department'            => '',
+            'post'                  => 'required',
+            'employment'            => 'nullable|date_format:Y-m-d',
+            'dismissal'             => "nullable|date_format:Y-m-d",
+        ];
+
+        $messages       = [
+            'post'                  => 'Укажите должность',
+            'dismissal.min'         => "Дата увольнение не может быть позже даты трудоустройства",
+        ];
+
+        $form = $request->validate($rules,$messages);
+
+        if(!isset($staff))
+            $staff = Staff::create([
+                'uid'       => $this->user->id,
+            ]);
+
+        $staff->update($form);
+
+        $checkRole          = Role::checkUserRole($this->user->id,'staff');
+
+
+        Notification::updateOrCreate(
+            [
+                'code'      => 'save:staff',
+                'uid'       => $this->user->id,
+            ],
+            [
+                'type'      => 'success',
+                'permanent' => $checkRole?'no':'yes',
+                'message'   =>
+                    $checkRole
+                        ?'Данные о трудоустройстве сохранены'
+                        :'Заявка на получения роли сотрудника отправлена.<br>О подтверждении роли Вы будете уведомлены письмом'
+                    ,
+            ]
+        );
+
+        return redirect()->route($checkRole?'show:staff':'account');
     }
 }

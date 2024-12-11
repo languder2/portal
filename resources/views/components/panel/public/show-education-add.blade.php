@@ -1,10 +1,9 @@
 <section class="
         bg-white p-4 rounded-md mb-4
 ">
-
     <div class="flex flex-col lg:flex-row items-center">
         <div class="flex-1">
-            @if($count)
+            @if(count($list))
                 Вы можете указать несколько учебных записей
             @else
                 Учебные данные еще не заполнены

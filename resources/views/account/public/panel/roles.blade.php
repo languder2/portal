@@ -3,14 +3,12 @@
 ">
     <x-html.h3 text="Роли"/>
 
-        @if($roles->count())
+        @if(count($roleNames))
             <h3 class="font-semibold">
                 Вы имеете следующие роли:
             </h3>
             <p>
-                @foreach($roles as $role)
-                        {{$role->name}}
-                @endforeach
+                @php echo implode(', ',$roleNames) @endphp
             </p>
         @else
             <h3 class="font-semibold">
@@ -31,11 +29,15 @@
     </p>
     <hr class="my-3">
     <h3 class="font-semibold">
-        Преподавателям ФГБОУ ВО "МелГУ"
+        Сотрудникам ФГБОУ ВО "МелГУ"
     </h3>
     <p>
-        Для получения роли преподавателя ФГБОУ ВО "МелГУ"
-        <x-html.a link="#" text="заполните и отправьте Заявку." class="font-semibold"  />
+        Для получения роли сотрудника ФГБОУ ВО "МелГУ"
+        <x-html.a
+            :link="url(route('add:staff'))"
+            text="заполните и отправьте форму."
+            class="font-semibold"
+        />
     </p>
     <p>
         Роли преподавателя и студента не являются взаимоисключающимися.

@@ -17,7 +17,7 @@
 
         after:bg-bgImgItemMenuAfter
         after:absolute
-        after:z-10
+        after:z-0
         after:block
         after:h-4
         after:w-4
@@ -27,6 +27,7 @@
         after:opacity-0
         after:hover:opacity-100
         after:duration-300
+        after:hover:z-10
 
         before:bg-bgImgItemMenuAfter
         before:absolute

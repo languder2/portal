@@ -6,7 +6,7 @@ use App\Http\Controllers\AdminServiceController;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\AccountController;
 use App\Models\{Notification,UserDetail,Role};
-use App\Models\Education\{Faculty,Department,Form,Level,Speciality,Student};
+use App\Models\Education\{Faculty,Department,Form,Level,Speciality,Student,Staff};
 
 Route::get('/', function () {
 
@@ -62,6 +62,7 @@ Route::controller(AccountController::class)->prefix("account")->group(function (
             return redirect(route("home"));
 
         return view("pages.public.account",[
+            'roles'         => Role::getUserRoles(),
             "form"          => view("account.public.forms.password-change",[]),
             "headTitle"     => 'Портал ФГБОУ ВО "МелГУ": Смена пароля'
         ]);
@@ -78,6 +79,7 @@ Route::middleware("auth.check")
     ->group(function (){
         Route::get('',function(){
             return view('pages.public.account',[
+                'roles'         => Role::getUserRoles(),
                 'contents'      => [
                     "notifications"     => view("sections.public.notifications",
                         [
@@ -85,6 +87,7 @@ Route::middleware("auth.check")
                         ])->render(),
                     view('account.public.panel.roles',[
                         'user'      => auth()->user(),
+                        'roleNames' => Role::getUserRolesNames(auth()->user()->getAuthIdentifier()),
                         'roles'     => Role::getUserRoles(auth()->user()->getAuthIdentifier()),
                     ])->render(),
                 ],
@@ -97,6 +100,7 @@ Route::middleware("auth.check")
 
         Route::get('personal',function(){
             return view('pages.public.account',[
+                'roles'         => Role::getUserRoles(),
                 'contents'      => [
                     "notifications"     => view("sections.public.notifications",
                         [
@@ -119,6 +123,7 @@ Route::middleware("auth.check")
 
         Route::get('change/personal-base',function(){
             return view('pages.public.account',[
+                'roles'         => Role::getUserRoles(),
                 'contents'      => [
                     view('account.public.forms.personal-base',[
                         'user'      => auth()->user(),
@@ -133,6 +138,7 @@ Route::middleware("auth.check")
 
         Route::get('change/personal-identification',function(){
             return view('pages.public.account',[
+                'roles'         => Role::getUserRoles(),
                 'contents'      => [
                     view('account.public.forms.personal-identification',[
                         'detail'    => UserDetail::where('uid',auth()->user()->getAuthIdentifier())->first()
@@ -147,6 +153,7 @@ Route::middleware("auth.check")
 
         Route::get('educations',function(){
             return view('pages.public.account',[
+                'roles'         => Role::getUserRoles(),
                 'contents'      => [
                     "notifications"     => view("sections.public.notifications",
                         [
@@ -165,6 +172,7 @@ Route::middleware("auth.check")
 
         Route::get('educations/add',function(){
             return view('pages.public.account',[
+                'roles'         => Role::getUserRoles(),
                 'contents'      => [
                     "notifications"     => view("sections.public.notifications",
                         [
@@ -184,7 +192,6 @@ Route::middleware("auth.check")
         })->name('add:education');
 
         Route::get('educations/edit/{id}',function($id){
-
                     $student = Student::where([
                         'id'            => $id,
                         'uid'           => auth()->user()->getAuthIdentifier()
@@ -194,6 +201,7 @@ Route::middleware("auth.check")
                 return redirect(route('show:education'));
 
             return view('pages.public.account',[
+                'roles'         => Role::getUserRoles(),
                 'contents'      => [
                     "notifications"     => view("sections.public.notifications",
                         [
@@ -218,6 +226,46 @@ Route::middleware("auth.check")
 
         Route::get('educations/delete/{id}','deleteEducation')
             ->name("delete:education");
+
+        /* staff */
+        Route::get('staff',function(){
+            return view('pages.public.account',[
+                'roles'         => Role::getUserRoles(),
+                'contents'      => [
+                    "notifications"     => view("sections.public.notifications",
+                        [
+                            "list"          => Notification::getList(auth()->user()->getAuthIdentifier()),
+                        ])->render(),
+                    view('account.public.panel.staff-list',[
+                        'list'               => Staff::getList(),
+                    ])->render(),
+                ],
+                "headTitle"     => 'Портал ФГБОУ ВО "МелГУ": Учебные данные'
+            ]);
+        })->name('show:staff');
+
+        Route::get('staff/add',function(){
+            return view('pages.public.account',[
+                'roles'         => Role::getUserRoles(),
+                'contents'      => [
+                    "notifications"     => view("sections.public.notifications",
+                        [
+                            "list"          => Notification::getList(auth()->user()->getAuthIdentifier()),
+                        ])->render(),
+                    view('account.public.forms.staff',[
+                        'faculties'         => Faculty::getListForSelect(),
+                        'departments'       => Department::getListForSelect(['faculty']),
+                    ])->render(),
+                ],
+                "headTitle"     => 'Портал ФГБОУ ВО "МелГУ": Добавить данные о трудоустройстве'
+            ]);
+        })->name('add:staff');
+
+        Route::post('staff/save','saveStaff')
+            ->name("save:staff");
+
+        /**/
+
     });
 
 Route::controller(TestController::class)->prefix("test")->group(function () {
@@ -234,11 +282,13 @@ Route::controller(TestController::class)->prefix("test")->group(function () {
     Route::get("user/get",              function (){
         return dump(auth()->user());
     });
-
 });
+
 
 Route::controller(AdminServiceController::class)->prefix("as")->group(function () {
     Route::get('truncate/{table}',            "truncate")->name('as.truncate');
 });
 
 
+Route::view('under-construction','pages.public.under-construction')->name('under-construction');
+Route::view('admin','pages.public.under-construction')->name('admin');

@@ -19,6 +19,10 @@ class RoleSeeder extends Seeder
                 "name"      => "Администратор"
             ],
             [
+                "code"      => "staff",
+                "name"      => "Сотрудник",
+            ],
+            [
                 "code"      => "teacher",
                 "name"      => "Преподаватель",
             ],
@@ -37,8 +41,9 @@ class RoleSeeder extends Seeder
         ]);
 
         DB::table('role_assigned')->insert([
-           'uid'        => 1,
-           'rid'        => 1
+            'uid'           => 1,
+            'rid'           => 1,
+            'confirmed_at'  => '2023-11-20'
         ]);
 
 

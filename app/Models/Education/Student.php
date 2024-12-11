@@ -58,7 +58,7 @@ class Student extends User
 
     public static function updatingRole(int $uid): void
     {
-        if(Student::where('uid',$uid)->exists())
+        if(self::where('uid',$uid)->exists())
             Role::setRole($uid,'student');
 
         else

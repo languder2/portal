@@ -23,6 +23,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('uid');
             $table->unsignedBigInteger('rid');
+            $table->timestamp('confirmed_at')->nullable();
             $table->timestamps();
 
             $table->foreign('uid')->references('id')->on('users')

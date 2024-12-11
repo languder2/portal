@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 class Role extends Model
@@ -12,12 +11,9 @@ class Role extends Model
     protected $fillable = [
         'uid',
         'rid',
+        'confirmed_at'
     ];
 
-    public static function getRoleList()
-    {
-        return DB::table('roles')->get();
-    }
     public static function getRoleByCode(string $role):object
     {
         return DB::table('roles')->where('code',$role)->first();
@@ -25,7 +21,7 @@ class Role extends Model
     public static function setRole(int $uid,$role):bool
     {
         $role   = self::getRoleByCode($role);
-        $role   = Role::firstOrNew(
+        $role   = self::firstOrNew(
             [
                 'uid'       => $uid,
                 'rid'       => $role->id,
@@ -58,14 +54,49 @@ class Role extends Model
             ]
         )->delete();
     }
-
-    public static function getUserRoles(int $uid):Collection
+    public static function getUserRoles(int $uid = null):object
     {
-        return Role::where('uid',$uid)
+        if(is_null($uid))
+            $uid        = auth()->user()->getAuthIdentifier();
+
+        $roles          = Role::where('uid',$uid)
             ->join('roles','role_assigned.rid','=','roles.id')
-            ->select('role_assigned.*','roles.name')
+            ->select('role_assigned.*','roles.code','roles.name')
             ->get();
 
+        $response       = (object)[
+            'confirmed' => [],
+            'waiting'   => [],
+            'failed'   => [],
+        ];
+
+        foreach($roles->all() as $role)
+
+            $response[$role->code] = $role;
+
+        return $response;
+    }
+
+    public static function getUserRolesNames(int $uid):array
+    {
+        return array_map(function($role){
+            return $role->name;
+        },self::getUserRoles($uid));
+    }
+
+    public static function checkUserRole(int $uid,string $role,bool $confirmed = true):bool
+    {
+        $role   = self::getRoleByCode($role);
+
+        $roles  = self::where([
+            'uid'       => $uid,
+            'rid'       => $role->id,
+        ]);
+
+        if($confirmed)
+            $roles->whereNotNull('confirmed_at');
+
+        return $roles->exists();
     }
 
 }

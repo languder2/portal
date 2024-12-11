@@ -24,7 +24,9 @@
 @endsection
 
 @section('menu')
-    @include("layouts.public.menu")
+    @include("layouts.public.menu",[
+        'roles'     => @$roles
+    ])
 @endsection
 
 @section('news')

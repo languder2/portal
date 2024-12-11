@@ -37,7 +37,9 @@
     @if(isset($null))
         <option
             value=''
-            disabled
+
+
+            @disabled(isset($nullDisabled))
             @selected(empty($old) && empty($value))
         >
             {{$null}}@if(isset($required))* @endif

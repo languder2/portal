@@ -6,12 +6,12 @@
 
     @include("account.public.forms.login")
 
-    @include("content.public.main")
-
 @endsection
 
 @section('menu')
-    @include("layouts.public.menu")
+    @include("layouts.public.menu",[
+        'roles'     => @$roles
+    ])
 @endsection
 
 @section('news')
