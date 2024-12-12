@@ -43,6 +43,7 @@ return new class extends Migration
             $table->enum('type', ['success', 'info', 'warning', 'danger', 'secondary'])->default('secondary');
             $table->enum('permanent', ['yes', 'no'])->default('no');
             $table->longText('message')->nullable();
+            $table->timestamp('lifetime')->nullable();
             $table->timestamps();
 
             $table->foreign('uid')->references('id')->on('users')
@@ -55,6 +56,7 @@ return new class extends Migration
             $table->string('email');
             $table->string('token', 32)->unique();
             $table->string('code')->nullable();
+            $table->timestamp('lifetime')->nullable();
             $table->timestamps();
 
             $table->foreign('email')->references('email')->on('users')

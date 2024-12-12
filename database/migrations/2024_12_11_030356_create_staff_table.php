@@ -22,8 +22,14 @@ return new class extends Migration
             $table->date('employment')->nullable();
             $table->date('dismissal')->nullable();
 
+            $table->enum('status', ['created', 'confirmed','failed'])->default('created');
+
+            $table->longText('comment')->nullable();
+            $table->string('template')->nullable();
+
             /* time marks */
 
+            $table->timestamp('confirmed_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
 

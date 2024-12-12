@@ -12,6 +12,7 @@ class Token extends Model
         'email',
         'code',
         'token',
+        'lifetime',
     ];
 
 }

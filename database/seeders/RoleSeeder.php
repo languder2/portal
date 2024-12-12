@@ -43,7 +43,8 @@ class RoleSeeder extends Seeder
         DB::table('role_assigned')->insert([
             'uid'           => 1,
             'rid'           => 1,
-            'confirmed_at'  => '2023-11-20'
+            'confirmed_at'  => '2023-11-20',
+            'status'        => 'confirmed',
         ]);
 
 

@@ -102,11 +102,12 @@ class User extends Authenticatable
         Token::updateOrCreate(
             [
                 'email'     => $user->email,
+                'code'      => 'verification:email'
             ],
             [
                 'token'     => $token,
                 'email'     => $user->email,
-                'code'      => 'verification:email'
+                'lifetime'  => now()->addDay(3)
             ]
         );
 

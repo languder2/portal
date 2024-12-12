@@ -11,17 +11,23 @@ class Role extends Model
     protected $fillable = [
         'uid',
         'rid',
-        'confirmed_at'
+        'status',
+        'comment',
+        'template',
+        'confirmed_at',
     ];
 
     public static function getRoleByCode(string $role):object
     {
         return DB::table('roles')->where('code',$role)->first();
     }
-    public static function setRole(int $uid,$role):bool
+    public static function setRole(?int $uid = null,$role):bool
     {
+        if(is_null($uid))
+            $uid = auth()->id();
+
         $role   = self::getRoleByCode($role);
-        $role   = self::firstOrNew(
+        $role   = self::updateOrCreate(
             [
                 'uid'       => $uid,
                 'rid'       => $role->id,
@@ -54,34 +60,49 @@ class Role extends Model
             ]
         )->delete();
     }
-    public static function getUserRoles(int $uid = null):object
+    public static function getUserRoles(int $uid = null,?string $status = null):object|array
     {
+
+
+        $response       = (object)[
+            'created'   => [],
+            'confirmed' => [],
+            'failed'    => [],
+            'all'       => []
+        ];
+
+        if(!is_null($status))
+            if(!isset($response->{$status}))
+                return [];
+
         if(is_null($uid))
-            $uid        = auth()->user()->getAuthIdentifier();
+            $uid        = auth()->id();
 
         $roles          = Role::where('uid',$uid)
             ->join('roles','role_assigned.rid','=','roles.id')
             ->select('role_assigned.*','roles.code','roles.name')
             ->get();
 
-        $response       = (object)[
-            'confirmed' => [],
-            'waiting'   => [],
-            'failed'   => [],
-        ];
+        foreach($roles->all() as $role){
+            $response->{$role->status}[$role->code] = $role;
+            $response->all[$role->code] = $role;
+        }
 
-        foreach($roles->all() as $role)
-
-            $response[$role->code] = $role;
-
-        return $response;
+        return is_null($status)?$response:$response->{$status};
     }
 
-    public static function getUserRolesNames(int $uid):array
+    public static function getUserRolesNames(int $uid = null):object
     {
-        return array_map(function($role){
-            return $role->name;
-        },self::getUserRoles($uid));
+        $response = (object)[];
+
+        $list = self::getUserRoles($uid);
+
+        foreach($list as $type=>$roles)
+            $response->{$type} = array_map(function($role){
+                    return $role->name;
+                },$roles??[]);
+
+        return $response;
     }
 
     public static function checkUserRole(int $uid,string $role,bool $confirmed = true):bool

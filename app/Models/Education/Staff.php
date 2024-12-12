@@ -28,7 +28,7 @@ class Staff extends User
     public static function getList(int $uid = null)
     {
         if(is_null($uid))
-            $uid    = auth()->user()->getAuthIdentifier();
+            $uid    = auth()->id();
 
         return self::where('uid',$uid)
             ->join('ed_faculties','ed_faculties.id','=','staffs.ed_faculty')

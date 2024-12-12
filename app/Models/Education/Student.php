@@ -34,7 +34,7 @@ class Student extends User
     {
 
         if(is_null($uid))
-            $uid    = auth()->user()->getAuthIdentifier();
+            $uid    = auth()->id();
 
         return self::where('uid',$uid)
             ->join('ed_faculties','ed_faculties.id','=','students.faculty')

@@ -62,7 +62,7 @@ Route::controller(AccountController::class)->prefix("account")->group(function (
             return redirect(route("home"));
 
         return view("pages.public.account",[
-            'roles'         => Role::getUserRoles(),
+            'roles'         => Role::getUserRoles(null,'all'),
             "form"          => view("account.public.forms.password-change",[]),
             "headTitle"     => 'Портал ФГБОУ ВО "МелГУ": Смена пароля'
         ]);
@@ -79,16 +79,16 @@ Route::middleware("auth.check")
     ->group(function (){
         Route::get('',function(){
             return view('pages.public.account',[
-                'roles'         => Role::getUserRoles(),
+                'roles'         => Role::getUserRoles(null,'all'),
                 'contents'      => [
                     "notifications"     => view("sections.public.notifications",
                         [
-                            "list"          => Notification::getList(auth()->user()->getAuthIdentifier()),
+                            "list"          => Notification::getList(auth()->id()),
                         ])->render(),
                     view('account.public.panel.roles',[
-                        'user'      => auth()->user(),
-                        'roleNames' => Role::getUserRolesNames(auth()->user()->getAuthIdentifier()),
-                        'roles'     => Role::getUserRoles(auth()->user()->getAuthIdentifier()),
+                        'user'          => auth()->user(),
+                        'rolesNames'    => Role::getUserRolesNames(),
+                        'roles'         => Role::getUserRoles(),
                     ])->render(),
                 ],
                 "headTitle"     => 'Портал ФГБОУ ВО "МелГУ": Аккаунт'
@@ -100,21 +100,21 @@ Route::middleware("auth.check")
 
         Route::get('personal',function(){
             return view('pages.public.account',[
-                'roles'         => Role::getUserRoles(),
+                'roles'         => Role::getUserRoles(null,'all'),
                 'contents'      => [
                     "notifications"     => view("sections.public.notifications",
                         [
-                            "list"          => Notification::getList(auth()->user()->getAuthIdentifier()),
+                            "list"          => Notification::getList(auth()->id()),
                     ])->render(),
                     view('account.public.panel.personal-base',[
                         'user'      => auth()->user(),
-                        'detail'    => UserDetail::where('uid',auth()->user()->getAuthIdentifier())->first()
+                        'detail'    => UserDetail::where('uid',auth()->id())->first()
                     ])->render(),
                     view('account.public.panel.personal-identification',[
-                        'detail'    => UserDetail::where('uid',auth()->user()->getAuthIdentifier())->first()
+                        'detail'    => UserDetail::where('uid',auth()->id())->first()
                     ])->render(),
 //                    view('account.public.panel.personal-address',[
-//                        'detail'    => UserDetail::where('uid',auth()->user()->getAuthIdentifier())->first()
+//                        'detail'    => UserDetail::where('uid',auth()->id())->first()
 //                    ])->render(),
                 ],
                 "headTitle"     => 'Портал ФГБОУ ВО "МелГУ": Персональные данные'
@@ -123,11 +123,11 @@ Route::middleware("auth.check")
 
         Route::get('change/personal-base',function(){
             return view('pages.public.account',[
-                'roles'         => Role::getUserRoles(),
+                'roles'         => Role::getUserRoles(null,'all'),
                 'contents'      => [
                     view('account.public.forms.personal-base',[
                         'user'      => auth()->user(),
-                        'detail'    => UserDetail::where('uid',auth()->user()->getAuthIdentifier())->first()
+                        'detail'    => UserDetail::where('uid',auth()->id())->first()
                     ])->render(),
                 ],
                 "headTitle"     => 'Портал ФГБОУ ВО "МелГУ": Персональные данные'
@@ -138,10 +138,10 @@ Route::middleware("auth.check")
 
         Route::get('change/personal-identification',function(){
             return view('pages.public.account',[
-                'roles'         => Role::getUserRoles(),
+                'roles'         => Role::getUserRoles(null,'all'),
                 'contents'      => [
                     view('account.public.forms.personal-identification',[
-                        'detail'    => UserDetail::where('uid',auth()->user()->getAuthIdentifier())->first()
+                        'detail'    => UserDetail::where('uid',auth()->id())->first()
                     ])->render(),
                 ],
                 "headTitle"     => 'Портал ФГБОУ ВО "МелГУ": Персональные данные'
@@ -153,14 +153,14 @@ Route::middleware("auth.check")
 
         Route::get('educations',function(){
             return view('pages.public.account',[
-                'roles'         => Role::getUserRoles(),
+                'roles'         => Role::getUserRoles(null,'all'),
                 'contents'      => [
                     "notifications"     => view("sections.public.notifications",
                         [
-                            "list"          => Notification::getList(auth()->user()->getAuthIdentifier()),
+                            "list"          => Notification::getList(auth()->id()),
                         ])->render(),
                     view('account.public.forms.snils',[
-                        'uDetail'           => UserDetail::where('uid',auth()->user()->getAuthIdentifier())->first()
+                        'uDetail'           => UserDetail::where('uid',auth()->id())->first()
                     ])->render(),
                     view('account.public.panel.education-list',[
                         'list'               => Student::getList(),
@@ -172,11 +172,11 @@ Route::middleware("auth.check")
 
         Route::get('educations/add',function(){
             return view('pages.public.account',[
-                'roles'         => Role::getUserRoles(),
+                'roles'         => Role::getUserRoles(null,'all'),
                 'contents'      => [
                     "notifications"     => view("sections.public.notifications",
                         [
-                            "list"          => Notification::getList(auth()->user()->getAuthIdentifier()),
+                            "list"          => Notification::getList(auth()->id()),
                         ])->render(),
                     view('account.public.forms.education',[
                         'faculties'         => Faculty::getListForSelect(),
@@ -184,7 +184,7 @@ Route::middleware("auth.check")
                         'levels'            => Level::getListForSelect(),
                         'forms'             => Form::getListForSelect(),
                         'specialities'      => Speciality::getListForSelect(['faculty','level'],['code',' ','name']),
-                        'uDetail'           => UserDetail::where('uid',auth()->user()->getAuthIdentifier())->first()
+                        'uDetail'           => UserDetail::where('uid',auth()->id())->first()
                     ])->render(),
                 ],
                 "headTitle"     => 'Портал ФГБОУ ВО "МелГУ": Добавить учебные данные'
@@ -194,18 +194,18 @@ Route::middleware("auth.check")
         Route::get('educations/edit/{id}',function($id){
                     $student = Student::where([
                         'id'            => $id,
-                        'uid'           => auth()->user()->getAuthIdentifier()
+                        'uid'           => auth()->id()
                     ])->first();
 
             if(is_null($student))
                 return redirect(route('show:education'));
 
             return view('pages.public.account',[
-                'roles'         => Role::getUserRoles(),
+                'roles'         => Role::getUserRoles(null,'all'),
                 'contents'      => [
                     "notifications"     => view("sections.public.notifications",
                         [
-                            "list"          => Notification::getList(auth()->user()->getAuthIdentifier()),
+                            "list"          => Notification::getList(auth()->id()),
                         ])->render(),
                     view('account.public.forms.education',[
                         'faculties'         => Faculty::getListForSelect(),
@@ -213,7 +213,7 @@ Route::middleware("auth.check")
                         'levels'            => Level::getListForSelect(),
                         'forms'             => Form::getListForSelect(),
                         'specialities'      => Speciality::getListForSelect(['faculty','level'],['code',' ','name']),
-                        'uDetail'           => UserDetail::where('uid',auth()->user()->getAuthIdentifier())->first(),
+                        'uDetail'           => UserDetail::where('uid',auth()->id())->first(),
                         'student'           => $student
                     ])->render(),
                 ],
@@ -230,11 +230,11 @@ Route::middleware("auth.check")
         /* staff */
         Route::get('staff',function(){
             return view('pages.public.account',[
-                'roles'         => Role::getUserRoles(),
+                'roles'         => Role::getUserRoles(null,'all'),
                 'contents'      => [
                     "notifications"     => view("sections.public.notifications",
                         [
-                            "list"          => Notification::getList(auth()->user()->getAuthIdentifier()),
+                            "list"          => Notification::getList(auth()->id()),
                         ])->render(),
                     view('account.public.panel.staff-list',[
                         'list'               => Staff::getList(),
@@ -246,11 +246,11 @@ Route::middleware("auth.check")
 
         Route::get('staff/add',function(){
             return view('pages.public.account',[
-                'roles'         => Role::getUserRoles(),
+                'roles'         => Role::getUserRoles(null,'all'),
                 'contents'      => [
                     "notifications"     => view("sections.public.notifications",
                         [
-                            "list"          => Notification::getList(auth()->user()->getAuthIdentifier()),
+                            "list"          => Notification::getList(auth()->id()),
                         ])->render(),
                     view('account.public.forms.staff',[
                         'faculties'         => Faculty::getListForSelect(),

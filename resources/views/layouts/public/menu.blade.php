@@ -8,7 +8,7 @@
 
         @if(auth()->check())
             <ul class="mt-6">
-                @if(isset($roles['admin']))
+                @if(isset($roles['admin']) && !is_null($roles['admin']->confirmed_at))
                     <x-li-menu
                          icons="account"
                          link="{{url(route('admin'))}}"
@@ -114,5 +114,3 @@
         &copy; 2024 ФГБОУ ВО "МелГУ"
     </div>
 </nav>
-
-

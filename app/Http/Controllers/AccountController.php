@@ -18,7 +18,7 @@ class AccountController extends Controller
     public function __construct()
     {
         if(auth()->check()){
-            $this->user = User::find(auth()->user()->getAuthIdentifier());
+            $this->user = User::find(auth()->id());
 
             $this->detail     = UserDetail::where('uid',$this->user->id)->first();
 
@@ -187,7 +187,7 @@ class AccountController extends Controller
     }
     public function page():View|RedirectResponse
     {
-        $user           = User::find(auth()->user()->getAuthIdentifier());
+        $user           = User::find(auth()->id());
 
         $user->roles    = Role::where("uid",$user->id)->get();
 
@@ -253,10 +253,11 @@ class AccountController extends Controller
         Token::updateOrCreate(
             [
                 "email"     => $user->email,
+                "code"      => 'password:recovery',
             ],
             [
                 "token"     => $token,
-                "code"      => 'password:recovery'
+                'lifetime'  => now()->addHour(1)
             ]
         );
 
@@ -308,6 +309,8 @@ class AccountController extends Controller
 
         $user = User::create((array)$form);
 
+        Role::setRole($user->id,'guest');
+
         User::sendEmailVerification($user,$pass??null);
 
         return redirect()->route("message")->with([
@@ -320,7 +323,7 @@ class AccountController extends Controller
     }
     public function resendEmailVerification():RedirectResponse
     {
-        $user =  User::find(auth()->user()->getAuthIdentifier());
+        $user =  User::find(auth()->id());
 
         Notification::create([
             'uid'               => $user->id,
@@ -421,7 +424,7 @@ class AccountController extends Controller
 
             $student = Student::where([
                 'id'            => $request->get('id'),
-                'uid'           => auth()->user()->getAuthIdentifier()
+                'uid'           => auth()->id()
             ])->first();
 
             if(is_null($student))
@@ -497,7 +500,7 @@ class AccountController extends Controller
 
         $student = Student::where([
             'id'            => $id,
-            'uid'           => auth()->user()->getAuthIdentifier()
+            'uid'           => auth()->id()
         ])->first();
 
         if(is_null($student))
@@ -529,7 +532,7 @@ class AccountController extends Controller
 
             $staff = Staff::where([
                 'id'            => $request->get('id'),
-                'uid'           => auth()->user()->getAuthIdentifier()
+                'uid'           => auth()->id()
             ])->first();
 
             if(is_null($staff))
@@ -561,6 +564,7 @@ class AccountController extends Controller
 
         $checkRole          = Role::checkUserRole($this->user->id,'staff');
 
+        Staff::updatingRole($this->user->id);
 
         Notification::updateOrCreate(
             [

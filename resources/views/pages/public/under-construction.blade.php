@@ -14,7 +14,7 @@
 
 @section('menu')
     @include("layouts.public.menu",[
-        'roles'     => \App\Models\Role::getUserRoles()
+        'roles'     => \App\Models\Role::getUserRoles(null,'confirmed')
     ])
 @endsection
 

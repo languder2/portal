@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use App\Models\{Notification, Token};
 
 class AuthCheck
 {
@@ -18,6 +19,10 @@ class AuthCheck
 
         if(!auth()->check())
             return redirect()->route('home');
+
+        Token::where('lifetime', '<', now())->delete();
+
+        Notification::where('lifetime', '<', now())->delete();
 
         return $next($request);
     }

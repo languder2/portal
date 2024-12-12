@@ -23,6 +23,9 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('uid');
             $table->unsignedBigInteger('rid');
+            $table->enum('status', ['created', 'confirmed','failed'])->default('created');
+            $table->longText('comment')->nullable();
+            $table->string('template')->nullable();
             $table->timestamp('confirmed_at')->nullable();
             $table->timestamps();
 

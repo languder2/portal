@@ -24,6 +24,13 @@ return new class extends Migration
             $table->string('contract_number')->nullable();
             $table->year('year_from')->nullable();
             $table->year('year_to')->nullable();
+
+            $table->enum('status', ['created', 'confirmed','failed'])->default('created');
+
+            $table->longText('comment')->nullable();
+
+            $table->string('template')->nullable();
+            $table->timestamp('confirmed_at')->nullable();
             $table->timestamps();
 
             $table->softDeletes();
