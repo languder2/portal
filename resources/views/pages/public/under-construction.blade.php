@@ -7,7 +7,8 @@
 @section('content')
 
     <div class="mb-4">
-        <img src="{!! asset('img/under-construction.jpg') !!}" class="rounded-md"/>
+        <img src="{!! asset('img/under-construction.jpg') !!}" class="rounded-md hidden"/>
+        <img src="{!! asset('img/work-in-progress.jpg') !!}" class="rounded-[40px] mx-auto"/>
     </div>
 
 @endsection

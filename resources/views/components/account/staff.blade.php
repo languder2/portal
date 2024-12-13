@@ -54,10 +54,10 @@
 
     <div class="flex flex-col-reverse xs:flex-row">
         <div class="flex-1 text-right xs:text-left">
-            <x-html.a link="{{url(route('delete:education',['id'=>$record->id]))}}" text="удалить" class="lowercase"/>
+            <x-html.a link="{{url(route('staff:delete',['id'=>$record->id]))}}" text="удалить" class="lowercase"/>
         </div>
         <div class="flex-1 text-right">
-            <x-html.a link="{{url(route('edit:education',['id'=>$record->id]))}}" text="редактировать" class="lowercase"/>
+            <x-html.a link="{{url(route('staff:delete',['id'=>$record->id]))}}" text="редактировать" class="lowercase"/>
         </div>
     </div>
 </section>

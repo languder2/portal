@@ -21,33 +21,19 @@ class Role extends Model
     {
         return DB::table('roles')->where('code',$role)->first();
     }
-    public static function setRole(?int $uid = null,$role):bool
+    public static function setRole(?int $uid = null,$role):void
     {
         if(is_null($uid))
             $uid = auth()->id();
 
         $role   = self::getRoleByCode($role);
-        $role   = self::updateOrCreate(
+
+        self::updateOrCreate(
             [
                 'uid'       => $uid,
                 'rid'       => $role->id,
             ]
         );
-
-        if(!$role->exists){
-            Notification::updateOrCreate(
-                [
-                    'code'      => 'role:assigment:student',
-                    'uid'       => $uid,
-                ],
-                [
-                    'type'      => 'success',
-                    'message'   => 'Роль студента ФГБОУ ВО "МелГУ" присвоена',
-                ]
-            );
-            $role->save();
-        }
-        return true;
     }
 
     public static function deleteRole(int $uid,$role):void
@@ -105,7 +91,7 @@ class Role extends Model
         return $response;
     }
 
-    public static function checkUserRole(int $uid,string $role,bool $confirmed = true):bool
+    public static function checkUserRole(int $uid,string $role,bool $confirmed = false):bool
     {
         $role   = self::getRoleByCode($role);
 

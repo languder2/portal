@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\AdminServiceController;
 use Illuminate\Support\Facades\Session;
-use App\Http\Controllers\AccountController;
+use App\Http\Controllers\{AccountController,StaffController,StudentController};
 use App\Models\{Notification,UserDetail,Role};
 use App\Models\Education\{Faculty,Department,Form,Level,Speciality,Student,Staff};
 
@@ -83,7 +83,7 @@ Route::middleware("auth.check")
                 'contents'      => [
                     "notifications"     => view("sections.public.notifications",
                         [
-                            "list"          => Notification::getList(auth()->id()),
+                            "list"          => Notification::getList(),
                         ])->render(),
                     view('account.public.panel.roles',[
                         'user'          => auth()->user(),
@@ -151,6 +151,15 @@ Route::middleware("auth.check")
         Route::post('save/personal-identification','savePersonalIdentification')
             ->name("save:personal-identification");
 
+    });
+
+
+// Student Actions
+Route::middleware("auth.check")
+    ->controller(StudentController::class)
+    ->prefix("account")
+    ->group(function (){
+        /* list */
         Route::get('educations',function(){
             return view('pages.public.account',[
                 'roles'         => Role::getUserRoles(null,'all'),
@@ -170,6 +179,7 @@ Route::middleware("auth.check")
             ]);
         })->name('show:education');
 
+        /* add */
         Route::get('educations/add',function(){
             return view('pages.public.account',[
                 'roles'         => Role::getUserRoles(null,'all'),
@@ -191,11 +201,12 @@ Route::middleware("auth.check")
             ]);
         })->name('add:education');
 
+        /* edit */
         Route::get('educations/edit/{id}',function($id){
-                    $student = Student::where([
-                        'id'            => $id,
-                        'uid'           => auth()->id()
-                    ])->first();
+            $student = Student::where([
+                'id'            => $id,
+                'uid'           => auth()->id()
+            ])->first();
 
             if(is_null($student))
                 return redirect(route('show:education'));
@@ -221,13 +232,22 @@ Route::middleware("auth.check")
             ]);
         })->name('edit:education');
 
+        /* save */
         Route::post('educations/save','saveEducation')
             ->name("save:education");
 
+        /* delete */
         Route::get('educations/delete/{id}','deleteEducation')
             ->name("delete:education");
+    });
 
-        /* staff */
+// Staff Action
+Route::middleware("auth.check")
+    ->controller(StaffController::class)
+    ->prefix("account")
+    ->group(function (){
+
+        /* list */
         Route::get('staff',function(){
             return view('pages.public.account',[
                 'roles'         => Role::getUserRoles(null,'all'),
@@ -244,6 +264,7 @@ Route::middleware("auth.check")
             ]);
         })->name('show:staff');
 
+        /* add */
         Route::get('staff/add',function(){
             return view('pages.public.account',[
                 'roles'         => Role::getUserRoles(null,'all'),
@@ -261,12 +282,18 @@ Route::middleware("auth.check")
             ]);
         })->name('add:staff');
 
+        /* save */
         Route::post('staff/save','saveStaff')
             ->name("save:staff");
 
-        /**/
-
+        /* delete */
+        Route::get('staff/delete/{id}','deleteStaff')
+            ->name("staff:delete");
     });
+
+// Staff End
+
+
 
 Route::controller(TestController::class)->prefix("test")->group(function () {
     Route::get('',                  "test");

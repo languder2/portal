@@ -27,6 +27,10 @@ class Student extends User
         'speciality',
         'year_from',
         'year_to',
+        'status',
+        'comment',
+        'template',
+        'confirmed_at',
     ];
 
 

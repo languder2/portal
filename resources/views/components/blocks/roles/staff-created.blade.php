@@ -16,8 +16,8 @@
     <p>
         Вы можете проверить поданные данные на странице
         <x-html.a
-            link="{{url(route('show:education'))}}"
-            text="учебные данные"
+            link="{{url(route('show:staff'))}}"
+            text="Рабочие данные"
             class="font-semibold text-nowrap"
         />
     </p>

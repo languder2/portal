@@ -20,9 +20,9 @@ class AuthCheck
         if(!auth()->check())
             return redirect()->route('home');
 
-        Token::where('lifetime', '<', now())->delete();
+        Token::whereNotNull('lifetime')->where('lifetime', '<', now())->delete();
 
-        Notification::where('lifetime', '<', now())->delete();
+        Notification::whereNotNull('lifetime')->where('lifetime', '<', now())->delete();
 
         return $next($request);
     }

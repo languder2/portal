@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\{Model, Collection};
+use function Laravel\Prompts\table;
+
 class Notification extends Model
 {
     protected $table    = 'notifications';
@@ -16,11 +18,16 @@ class Notification extends Model
         'template',
         'created_at',
         'updated_at',
+        'lifetime',
     ];
 
-    public static function getList($uid):Collection
+    public static function getList(?int $uid =  null):Collection
     {
-        $notifications  = Notification::where("uid",$uid)
+
+        if(is_null($uid))
+            $uid        = auth()->id();
+
+        $list  = Notification::where("uid",$uid)
             ->orderByRaw("
 
                 CASE permanent
@@ -38,18 +45,18 @@ class Notification extends Model
             ")
             ->get();
 
-        foreach ($notifications as $notification) {
-            if ($notification->permanent === "no")
-                $notification->delete();
-
-            if ($notification->template !== null)
-                if (view()->exists($notification->template))
-                    $notification->message = view($notification->template, [
-                        'data' => json_decode($notification->message)
+        foreach ($list as $item)
+            if ($item->template !== null and view()->exists($item->template))
+                $item->message = view($item->template, [
+                        'data' => json_decode($item->message)
                     ])->render();
-        }
 
-        return $notifications;
+        Notification::where([
+            'uid'           => $uid,
+            'permanent'     => 'no',
+        ])->whereNull('lifetime')->delete();
+
+        return $list;
     }
 
 }
